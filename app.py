@@ -1098,13 +1098,13 @@ def main():
                         st.write(ai_narrative)
                     else:
                         st.error(ai_label + ":")
-                        # Try different display methods to isolate the issue
+                        # Debug: Show exact text being displayed
+                        st.write("**Raw text (repr):**")
+                        st.code(repr(ai_narrative))
+                        st.write("**Raw text (as-is):**")
+                        st.code(ai_narrative)
                         st.write("**Method 1 - st.write:**")
                         st.write(ai_narrative)
-                        st.write("**Method 2 - st.markdown:**")
-                        st.markdown(ai_narrative)
-                        st.write("**Method 3 - st.text:**")
-                        st.text(ai_narrative)
             else:
                 # Fallback to static narrative
                 if metrics['margin'] > 0:
