@@ -580,13 +580,19 @@ def main():
     selected_scenario_key = st.sidebar.selectbox(
         "Choose a scenario:",
         options=list(scenario_options.keys()),
-        index=0
+        index=0,
+        key="scenario_selectbox"
     )
     
-    if st.sidebar.button("🔄 Load Selected Scenario"):
+    # Auto-load scenario when dropdown selection changes
+    if 'last_selected_scenario' not in st.session_state:
+        st.session_state.last_selected_scenario = selected_scenario_key
+    
+    if st.session_state.last_selected_scenario != selected_scenario_key:
         scenario_key = scenario_options[selected_scenario_key]
         scenario = get_scenario(scenario_key)
         st.session_state.current_scenario = scenario
+        st.session_state.last_selected_scenario = selected_scenario_key
         # Trigger rerun to update the UI
         st.experimental_rerun()
     
