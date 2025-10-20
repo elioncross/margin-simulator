@@ -607,49 +607,52 @@ def _get_google_ai_api_key() -> str:
     if api_key:
         return api_key
     
-    # Try Streamlit secrets (only in cloud environments to avoid local warnings)
+    # Only try Streamlit secrets in cloud environments
+    # Check environment variables first to avoid any secrets access
+    is_cloud_env = (
+        'STREAMLIT_CLOUD' in os.environ or 
+        'STREAMLIT_SHARING' in os.environ
+    )
+    
+    if not is_cloud_env:
+        # Running locally - don't try to access secrets to avoid warnings
+        return None
+    
+    # Running in cloud - try to access secrets
     try:
         import streamlit as st
-        # Check if we're in a cloud environment
-        is_cloud_env = (
-            'STREAMLIT_CLOUD' in os.environ or 
-            'STREAMLIT_SHARING' in os.environ or
-            hasattr(st, 'secrets') and hasattr(st.secrets, '_secrets')
-        )
+        # Try multiple access patterns for the API key
+        try:
+            # Try direct access first
+            api_key = st.secrets.get("GOOGLE_AI_API_KEY")
+            if api_key:
+                return api_key
+        except:
+            pass
         
-        if is_cloud_env:
-            # Try multiple access patterns for the API key
-            try:
-                # Try direct access first
-                api_key = st.secrets.get("GOOGLE_AI_API_KEY")
-                if api_key:
-                    return api_key
-            except:
-                pass
-            
-            try:
-                # Try nested access (secrets section format)
-                api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
-                if api_key:
-                    return api_key
-            except:
-                pass
-            
-            try:
-                # Try direct dictionary access
-                api_key = st.secrets["GOOGLE_AI_API_KEY"]
-                if api_key:
-                    return api_key
-            except:
-                pass
-            
-            try:
-                # Try nested dictionary access
-                api_key = st.secrets["secrets"]["GOOGLE_AI_API_KEY"]
-                if api_key:
-                    return api_key
-            except:
-                pass
+        try:
+            # Try nested access (secrets section format)
+            api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
+            if api_key:
+                return api_key
+        except:
+            pass
+        
+        try:
+            # Try direct dictionary access
+            api_key = st.secrets["GOOGLE_AI_API_KEY"]
+            if api_key:
+                return api_key
+        except:
+            pass
+        
+        try:
+            # Try nested dictionary access
+            api_key = st.secrets["secrets"]["GOOGLE_AI_API_KEY"]
+            if api_key:
+                return api_key
+        except:
+            pass
     except:
         pass
     
