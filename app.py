@@ -341,11 +341,14 @@ def display_help_guide():
         ### Predefined Scenarios:
         - **✅ Profitable Example**: High margin, good coverage scenario (default)
         - **❌ Unprofitable Example**: Low margin, budget-constrained scenario
-        - **High Volume**: Large number of lines
-        - **Premium**: High-end pricing scenario
-        - **Budget**: Cost-optimized scenario
+        - **High Volume**: Large number of lines with volume discounts
+        - **Premium**: High-end pricing scenario with heavy usage
+        - **Budget**: Cost-optimized scenario with light usage
         - **🎯 SCO-Enabled Enterprise**: Enterprise with intelligent cost optimization
         - **🎯 SCO-Enabled Retail**: Retail households with SCO optimization
+        - **📊 Enterprise Baseline (No SCO)**: Enterprise without SCO for comparison
+        - **📈 High Usage**: Heavy data usage with potential overages
+        - **📉 Low Usage**: Light data usage for efficiency testing
         
         ## 🤖 AI Features Guide
         
