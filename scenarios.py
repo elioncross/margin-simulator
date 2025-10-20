@@ -80,7 +80,8 @@ SCENARIOS = {
         'sco_enabled': True,
         'sco_efficiency': 0.85,
         'overage_rate': 15.0,
-        'plan_switching_cost': 2.0
+        'plan_switching_cost': 0.5,  # Lower cost for better SCO benefits
+        'monthly_usage_per_line': 4.5  # Higher usage to generate overages and show SCO benefits
     },
     'sco_retail': {
         'name': 'SCO-Enabled Retail',
@@ -96,7 +97,8 @@ SCENARIOS = {
         'sco_enabled': True,
         'sco_efficiency': 0.80,
         'overage_rate': 12.0,
-        'plan_switching_cost': 1.5
+        'plan_switching_cost': 0.3,  # Lower cost for better SCO benefits
+        'monthly_usage_per_line': 3.2  # Higher usage to generate overages and show SCO benefits
     },
     'traditional_static': {
         'name': 'Non-SCO Plans',

@@ -572,6 +572,17 @@ def main():
             # Update policy to match scenario setting
             if 'policy' in scenarios['profitable']:
                 st.session_state.policy = scenarios['profitable']['policy']
+            # Update SCO parameters to match scenario settings
+            if 'base_plan_gb' in scenarios['profitable']:
+                st.session_state.base_plan_gb = scenarios['profitable']['base_plan_gb']
+            if 'sco_efficiency' in scenarios['profitable']:
+                st.session_state.sco_efficiency = scenarios['profitable']['sco_efficiency']
+            if 'overage_rate' in scenarios['profitable']:
+                st.session_state.overage_rate = scenarios['profitable']['overage_rate']
+            if 'plan_switching_cost' in scenarios['profitable']:
+                st.session_state.plan_switching_cost = scenarios['profitable']['plan_switching_cost']
+            if 'monthly_usage_per_line' in scenarios['profitable']:
+                st.session_state.monthly_usage_per_line = scenarios['profitable']['monthly_usage_per_line']
             # Trigger rerun to update the UI
             st.experimental_rerun()
     
@@ -584,6 +595,17 @@ def main():
             # Update policy to match scenario setting
             if 'policy' in scenarios['unprofitable']:
                 st.session_state.policy = scenarios['unprofitable']['policy']
+            # Update SCO parameters to match scenario settings
+            if 'base_plan_gb' in scenarios['unprofitable']:
+                st.session_state.base_plan_gb = scenarios['unprofitable']['base_plan_gb']
+            if 'sco_efficiency' in scenarios['unprofitable']:
+                st.session_state.sco_efficiency = scenarios['unprofitable']['sco_efficiency']
+            if 'overage_rate' in scenarios['unprofitable']:
+                st.session_state.overage_rate = scenarios['unprofitable']['overage_rate']
+            if 'plan_switching_cost' in scenarios['unprofitable']:
+                st.session_state.plan_switching_cost = scenarios['unprofitable']['plan_switching_cost']
+            if 'monthly_usage_per_line' in scenarios['unprofitable']:
+                st.session_state.monthly_usage_per_line = scenarios['unprofitable']['monthly_usage_per_line']
             # Trigger rerun to update the UI
             st.experimental_rerun()
     
@@ -613,6 +635,18 @@ def main():
         # Update policy to match scenario setting
         if 'policy' in scenario:
             st.session_state.policy = scenario['policy']
+        
+        # Update SCO parameters to match scenario settings
+        if 'base_plan_gb' in scenario:
+            st.session_state.base_plan_gb = scenario['base_plan_gb']
+        if 'sco_efficiency' in scenario:
+            st.session_state.sco_efficiency = scenario['sco_efficiency']
+        if 'overage_rate' in scenario:
+            st.session_state.overage_rate = scenario['overage_rate']
+        if 'plan_switching_cost' in scenario:
+            st.session_state.plan_switching_cost = scenario['plan_switching_cost']
+        if 'monthly_usage_per_line' in scenario:
+            st.session_state.monthly_usage_per_line = scenario['monthly_usage_per_line']
         
         # Trigger rerun to update the UI
         st.experimental_rerun()
