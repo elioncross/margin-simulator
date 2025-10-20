@@ -283,12 +283,25 @@ def display_help_guide():
         - **AI Narrative**: Customer-oriented narratives
         - **Best For**: Customer presentations, reach discussions
         
-        ### Financial View - "What stakeholders see: Financial performance"
-        - **Purpose**: Analyze profitability and operational efficiency
+        ### Financial View - "Current scenario performance (SCO-aware if enabled)"
+        - **Purpose**: Analyze current profitability and operational efficiency
         - **Key Metrics**: Revenue, Carrier Cost, Margin %, Budget utilization
+        - **SCO Integration**: Shows current performance with SCO enabled (if applicable)
         - **Visualization**: Bar charts comparing costs and revenue
         - **AI Narrative**: Financial performance insights
-        - **Best For**: Internal reporting, financial planning
+        - **Best For**: Internal reporting, financial planning, current performance analysis
+        
+        ### SCO Analysis - "SCO impact analysis: How much better/worse with SCO"
+        - **Purpose**: Compare SCO-enabled vs non-SCO-enabled versions of the same scenario
+        - **Key Features**: 
+          - **Current Performance Summary**: Shows current scenario metrics
+          - **SCO Benefits Analysis**: Cost savings, margin improvement, ROI
+          - **Side-by-Side Comparison**: SCO vs non-SCO detailed breakdown
+          - **Customer vs Internal View**: What customers see vs internal reality
+        - **Relationship to Financial View**: 
+          - Financial View shows **current performance** (with SCO if enabled)
+          - SCO Analysis shows **improvement impact** (SCO vs non-SCO comparison)
+        - **Best For**: Pre-sales demonstrations, cost optimization, competitive differentiation
         
         ### AI Insights - "AI-powered forecasting and analysis" (NEW!)
         - **Purpose**: Get strategic insights and predict future performance
@@ -298,15 +311,6 @@ def display_help_guide():
           - **Advanced Analytics**: Correlation analysis, performance distributions
         - **Requirements**: Ollama for full AI features, templates as fallback
         - **Best For**: Strategic planning, risk assessment, competitive analysis
-        
-        ### SCO Analysis - "Smart Cost Optimization comparison" (NEW!)
-        - **Purpose**: Compare SCO-enabled vs non-SCO-enabled plans
-        - **Features**: 
-          - **Cost Analysis**: Detailed breakdown of SCO vs non-SCO costs
-          - **ROI Calculator**: Return on investment for SCO implementation
-          - **Customer Experience**: What customers see vs internal reality
-          - **Visualizations**: Cost comparisons and usage breakdowns
-        - **Best For**: Pre-sales demonstrations, cost optimization, competitive differentiation
         
         ### Excel View - "Traditional spreadsheet model" (NEW!)
         - **Purpose**: Show basic Excel-style analysis for comparison
@@ -476,11 +480,24 @@ def display_help_guide():
         1. Start with "SCO-Enabled Enterprise" scenario
         2. Show Excel View first (basic spreadsheet model)
         3. Switch to Customer View (unlimited experience)
-        4. Switch to Financial View (profitability focus)
-        5. Demonstrate SCO Analysis tab (cost savings and ROI)
+        4. Switch to Financial View (current performance with SCO)
+        5. Demonstrate SCO Analysis tab (SCO impact and benefits)
         6. Run "Find Optimal Pricing" to get optimization results
         7. Show AI Insights (trend analysis)
-        8. Compare with "Traditional Static Plans" scenario
+        8. Compare with "Enterprise Baseline (No SCO)" scenario
+        
+        ### Tab Workflow - Understanding the Relationship:
+        **Step 1: Financial View** - See current scenario performance
+        - Shows absolute metrics: Revenue, Cost, Margin
+        - Includes SCO Impact Summary (when SCO enabled)
+        - Provides detailed breakdown with formulas
+        
+        **Step 2: SCO Analysis** - Understand SCO impact
+        - Shows current performance summary
+        - Compares SCO vs non-SCO versions
+        - Demonstrates cost savings and ROI
+        
+        **Key Insight**: Financial View = "What we have now", SCO Analysis = "How much better with SCO"
         
         ### For Analysis:
         1. Load multiple scenarios for comparison
@@ -1110,7 +1127,13 @@ def main():
     
     with tab2:
         st.header("💰 Financial View")
-        st.markdown("### What stakeholders see: Financial performance")
+        st.markdown("### Current scenario performance (SCO-aware if enabled)")
+        
+        # SCO status indicator
+        if sco_enabled:
+            st.info("🎯 **SCO Enabled**: This view shows current performance with Smart Cost Optimization. See SCO Analysis tab to compare with/without SCO.")
+        else:
+            st.info("📊 **Traditional Model**: This view shows standard performance metrics. Enable SCO in sidebar to see optimization benefits.")
         
         # Show optimization results indicator if available
         if 'optimization_result' in st.session_state and st.session_state.optimization_result['feasible']:
@@ -1217,6 +1240,26 @@ def main():
         with col2:
             # Financial bar chart
             st.pyplot(create_bar_chart(metrics['carrier_cost'], metrics['revenue']))
+            
+            # SCO Impact Summary (when SCO is enabled)
+            if sco_enabled:
+                # Calculate SCO comparison for summary
+                sco_comparison = compare_sco_vs_traditional(
+                    students, base_plan_gb, cap, budget, carrier_rate, 
+                    customer_price, policy, throttling, sco_efficiency, 
+                    overage_rate, plan_switching_cost, monthly_usage_per_line
+                )
+                margin_improvement = sco_comparison['comparison']['margin_improvement']
+                cost_savings = sco_comparison['comparison']['cost_improvement']
+                
+                st.markdown("### 🎯 SCO Impact Summary")
+                st.metric(
+                    label="Margin Improvement",
+                    value=f"+{margin_improvement:.1%}",
+                    delta=f"${cost_savings:,.0f} cost savings",
+                    help="SCO improves margin compared to non-SCO version"
+                )
+                st.info("💡 **See SCO Analysis tab** for detailed comparison breakdown")
         
         # Detailed breakdown for internal view
         st.subheader("📋 Detailed Financial Breakdown")
@@ -1428,10 +1471,23 @@ def main():
     
     with tab3:
         st.header("🎯 Smart Cost Optimization (SCO) Analysis")
-        st.markdown("### Compare SCO-enabled vs non-SCO-enabled plans")
+        st.markdown("### SCO impact analysis: How much better/worse with SCO")
+        
+        # Cross-reference to Financial View
+        st.info("📊 **Current Performance**: See Financial View tab for detailed breakdown of the current scenario.")
         
         if sco_enabled:
             st.success("✅ SCO is currently enabled")
+            
+            # Current scenario summary
+            st.markdown("### 📊 Current Scenario Performance")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Current Margin", f"{metrics['margin']:.1%}")
+            with col2:
+                st.metric("Current Revenue", f"${metrics['revenue']:,.0f}")
+            with col3:
+                st.metric("Current Cost", f"${metrics['carrier_cost']:,.0f}")
             
             # Calculate SCO comparison
             sco_comparison = compare_sco_vs_traditional(
