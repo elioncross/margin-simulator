@@ -196,31 +196,8 @@ def _generate_google_ai_narrative(metrics: Dict[str, Any], context: Dict[str, An
     Note: This requires a Google AI API key to be set in the environment variable GOOGLE_AI_API_KEY.
     """
     
-    # Check if Google AI API key is available
-    api_key = os.getenv('GOOGLE_AI_API_KEY')
-    
-    # Try Streamlit secrets as fallback (only in cloud environments)
-    if not api_key:
-        try:
-            import streamlit as st
-            # Check if we're in a cloud environment to avoid local secrets warnings
-            is_cloud_env = (
-                'STREAMLIT_CLOUD' in os.environ or 
-                'STREAMLIT_SHARING' in os.environ
-            )
-            
-            if is_cloud_env:
-                try:
-                    # Try direct access first
-                    api_key = st.secrets.get("GOOGLE_AI_API_KEY")
-                    if not api_key:
-                        # Try nested access (current format)
-                        api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
-                except:
-                    # If secrets access fails, just continue without API key
-                    pass
-        except:
-            pass
+    # Get API key using the helper function
+    api_key = _get_google_ai_api_key()
     
     if not api_key:
         return None
@@ -487,31 +464,8 @@ def _generate_google_ai_optimization_narrative(optimization_result: Dict[str, An
     Generate optimization narrative using Google AI (Gemini API).
     """
     
-    # Check if Google AI API key is available
-    api_key = os.getenv('GOOGLE_AI_API_KEY')
-    
-    # Try Streamlit secrets as fallback (only in cloud environments)
-    if not api_key:
-        try:
-            import streamlit as st
-            # Check if we're in a cloud environment to avoid local secrets warnings
-            is_cloud_env = (
-                'STREAMLIT_CLOUD' in os.environ or 
-                'STREAMLIT_SHARING' in os.environ
-            )
-            
-            if is_cloud_env:
-                try:
-                    # Try direct access first
-                    api_key = st.secrets.get("GOOGLE_AI_API_KEY")
-                    if not api_key:
-                        # Try nested access (current format)
-                        api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
-                except:
-                    # If secrets access fails, just continue without API key
-                    pass
-        except:
-            pass
+    # Get API key using the helper function
+    api_key = _get_google_ai_api_key()
     
     if not api_key:
         return None
@@ -644,6 +598,55 @@ def _generate_template_optimization_narrative(optimization_result: Dict[str, Any
     # Clean up the narrative formatting
     return _clean_narrative(narrative)
 
+def _get_google_ai_api_key() -> str:
+    """
+    Get Google AI API key from environment or Streamlit secrets.
+    """
+    # Check environment variable first
+    api_key = os.getenv('GOOGLE_AI_API_KEY')
+    if api_key:
+        return api_key
+    
+    # Try Streamlit secrets
+    try:
+        import streamlit as st
+        # Try multiple access patterns for the API key
+        try:
+            # Try direct access first
+            api_key = st.secrets.get("GOOGLE_AI_API_KEY")
+            if api_key:
+                return api_key
+        except:
+            pass
+        
+        try:
+            # Try nested access (secrets section format)
+            api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
+            if api_key:
+                return api_key
+        except:
+            pass
+        
+        try:
+            # Try direct dictionary access
+            api_key = st.secrets["GOOGLE_AI_API_KEY"]
+            if api_key:
+                return api_key
+        except:
+            pass
+        
+        try:
+            # Try nested dictionary access
+            api_key = st.secrets["secrets"]["GOOGLE_AI_API_KEY"]
+            if api_key:
+                return api_key
+        except:
+            pass
+    except:
+        pass
+    
+    return None
+
 def get_ai_narrative_status() -> Dict[str, Any]:
     """
     Get the status of AI narrative capabilities.
@@ -657,30 +660,7 @@ def get_ai_narrative_status() -> Dict[str, Any]:
         pass
     
     # Check if Google AI API key is available
-    api_key = os.getenv('GOOGLE_AI_API_KEY')
-    
-    # Try Streamlit secrets as fallback (only in cloud environments)
-    if not api_key:
-        try:
-            import streamlit as st
-            # Check if we're in a cloud environment to avoid local secrets warnings
-            is_cloud_env = (
-                'STREAMLIT_CLOUD' in os.environ or 
-                'STREAMLIT_SHARING' in os.environ
-            )
-            
-            if is_cloud_env:
-                try:
-                    # Try direct access first
-                    api_key = st.secrets.get("GOOGLE_AI_API_KEY")
-                    if not api_key:
-                        # Try nested access (current format)
-                        api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
-                except:
-                    # If secrets access fails, just continue without API key
-                    pass
-        except:
-            pass
+    api_key = _get_google_ai_api_key()
     
     google_ai_available = bool(api_key)
     

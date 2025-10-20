@@ -20,6 +20,55 @@ from sklearn.metrics import r2_score, mean_absolute_error
 import warnings
 warnings.filterwarnings('ignore')
 
+def _get_google_ai_api_key() -> str:
+    """
+    Get Google AI API key from environment or Streamlit secrets.
+    """
+    # Check environment variable first
+    api_key = os.getenv('GOOGLE_AI_API_KEY')
+    if api_key:
+        return api_key
+    
+    # Try Streamlit secrets
+    try:
+        import streamlit as st
+        # Try multiple access patterns for the API key
+        try:
+            # Try direct access first
+            api_key = st.secrets.get("GOOGLE_AI_API_KEY")
+            if api_key:
+                return api_key
+        except:
+            pass
+        
+        try:
+            # Try nested access (secrets section format)
+            api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
+            if api_key:
+                return api_key
+        except:
+            pass
+        
+        try:
+            # Try direct dictionary access
+            api_key = st.secrets["GOOGLE_AI_API_KEY"]
+            if api_key:
+                return api_key
+        except:
+            pass
+        
+        try:
+            # Try nested dictionary access
+            api_key = st.secrets["secrets"]["GOOGLE_AI_API_KEY"]
+            if api_key:
+                return api_key
+        except:
+            pass
+    except:
+        pass
+    
+    return None
+
 def _clean_ai_text(text: str) -> str:
     """Clean up AI-generated text for better formatting."""
     # Remove excessive line breaks and normalize whitespace
@@ -164,8 +213,8 @@ def _generate_google_ai_trend_analysis(historical_data: pd.DataFrame, current_me
     Generate trend analysis using Google AI (Gemini API).
     """
     
-    # Check if Google AI API key is available
-    api_key = os.getenv('GOOGLE_AI_API_KEY')
+    # Get API key using the helper function
+    api_key = _get_google_ai_api_key()
     if not api_key:
         print("🔍 DEBUG: Google AI API key not found for trend analysis - using fallback templates")
         return None
@@ -492,8 +541,8 @@ IMPORTANT: Write as a single paragraph without line breaks or bullet points."""
 def _generate_google_ai_forecast_insights(forecasts: Dict[str, Any], historical_data: pd.DataFrame) -> Optional[str]:
     """Generate forecast insights using Google AI (Gemini API)."""
     
-    # Check if Google AI API key is available
-    api_key = os.getenv('GOOGLE_AI_API_KEY')
+    # Get API key using the helper function
+    api_key = _get_google_ai_api_key()
     if not api_key:
         print("🔍 DEBUG: Google AI API key not found for forecast insights - using fallback templates")
         return None
@@ -681,7 +730,7 @@ def get_ai_insights_status() -> Dict[str, Any]:
         pass
     
     # Check if Google AI API key is available
-    google_ai_available = bool(os.getenv('GOOGLE_AI_API_KEY'))
+    google_ai_available = bool(_get_google_ai_api_key())
     
     # Determine status message
     if ollama_available and google_ai_available:
