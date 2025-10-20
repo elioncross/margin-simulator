@@ -422,13 +422,13 @@ def compare_sco_vs_traditional(students, base_plan_gb, customer_cap, budget, car
                               customer_price, policy, throttling, sco_efficiency=0.85, 
                               overage_rate=15.0, plan_switching_cost=2.0, monthly_usage_per_line=2.5):
     """
-    Compare SCO-enabled vs non-SCO-enabled plans.
+    Compare SCO-enabled vs non-SCO-enabled plans using the same calculation method.
     
     Returns:
         dict: Comparison analysis between SCO-enabled and non-SCO-enabled approaches
     """
     
-    # Calculate SCO metrics
+    # Calculate SCO metrics (SCO enabled)
     sco_metrics = calculate_sco_metrics(
         students, base_plan_gb, customer_cap, budget, carrier_rate, 
         customer_price, policy, throttling, sco_enabled=True,
@@ -436,10 +436,13 @@ def compare_sco_vs_traditional(students, base_plan_gb, customer_cap, budget, car
         plan_switching_cost=plan_switching_cost, monthly_usage_per_line=monthly_usage_per_line
     )
     
-    # Calculate non-SCO metrics (same scenario without SCO)
-    non_sco_metrics = calculate_metrics(
-        students, customer_cap, budget, carrier_rate, customer_price, policy, throttling, monthly_usage_per_line,
-        base_plan_gb, overage_rate
+    # Calculate non-SCO metrics using the same calculation method but with SCO disabled
+    # This ensures we're comparing apples to apples - same method, just SCO on/off
+    non_sco_metrics = calculate_sco_metrics(
+        students, base_plan_gb, customer_cap, budget, carrier_rate, 
+        customer_price, policy, throttling, sco_enabled=False,
+        sco_efficiency=0.0, overage_rate=overage_rate, 
+        plan_switching_cost=0.0, monthly_usage_per_line=monthly_usage_per_line
     )
     
     # Calculate improvements
