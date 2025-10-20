@@ -1000,6 +1000,15 @@ def main():
             # Trigger rerun to update the UI
             st.experimental_rerun()
     
+    # Debug: Show calculation parameters
+    st.sidebar.write(f"🔍 Calculation Parameters:")
+    st.sidebar.write(f"  - students: {students}")
+    st.sidebar.write(f"  - monthly_usage_per_line: {monthly_usage_per_line}")
+    st.sidebar.write(f"  - carrier_rate: {carrier_rate}")
+    st.sidebar.write(f"  - customer_price: {customer_price}")
+    st.sidebar.write(f"  - budget: {budget}")
+    st.sidebar.write(f"  - sco_enabled: {sco_enabled}")
+    
     # Calculate metrics (use SCO if enabled)
     if sco_enabled:
         metrics = calculate_sco_metrics(
