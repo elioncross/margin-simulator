@@ -346,7 +346,6 @@ def display_help_guide():
         - **Budget**: Cost-optimized scenario
         - **🎯 SCO-Enabled Enterprise**: Enterprise with intelligent cost optimization
         - **🎯 SCO-Enabled Retail**: Retail households with SCO optimization
-        - **📊 Traditional Static Plans**: Fixed plans with overage charges (no SCO)
         
         ## 🤖 AI Features Guide
         

@@ -102,22 +102,6 @@ SCENARIOS = {
         'plan_switching_cost': 0.3,  # Lower cost for better SCO benefits
         'monthly_usage_per_line': 3.2  # Higher usage to generate overages and show SCO benefits
     },
-    'traditional_static': {
-        'name': 'Non-SCO Plans',
-        'description': 'Fixed plans with overage charges (no SCO)',
-        'students': 500,
-        'cap': 5.0,
-        'base_plan_gb': 5.0,  # Same as customer cap
-        'budget': 12000.0,
-        'carrier_rate': 8.0,
-        'customer_price': 20.0,  # More realistic pricing
-        'policy': 'Public Sector (Schools)',
-        'throttling': False,
-        'sco_enabled': False,
-        'sco_efficiency': 0.0,
-        'overage_rate': 15.0,
-        'plan_switching_cost': 0.0
-    }
 }
 
 def get_scenario(scenario_key):
