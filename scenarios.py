@@ -21,10 +21,10 @@ UNPROFITABLE_SCENARIO = {
     'name': 'Unprofitable Example',
     'description': 'Suboptimal settings leading to losses',
     'students': 500,
-    'cap': 5.0,  # GB per student
-    'budget': 10000.0,  # $10k budget
-    'carrier_rate': 8.0,  # $8/GB
-    'customer_price': 25.0,  # $25/month per line
+    'cap': 8.0,  # High data cap
+    'budget': 8000.0,  # Low budget
+    'carrier_rate': 12.0,  # High carrier cost
+    'customer_price': 15.0,  # Low customer price
     'policy': 'Public Sector (Schools)',
     'throttling': False
 }
