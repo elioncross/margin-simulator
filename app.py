@@ -1086,6 +1086,9 @@ def main():
                     else:
                         ai_label = "📝 **Smart Template**"
                     
+                    # Debug: Show raw narrative before display
+                    st.write("🔍 DEBUG - Raw AI narrative:", repr(ai_narrative))
+                    
                     if metrics['margin'] > 0:
                         st.success(f"{ai_label}: {ai_narrative}")
                     elif metrics['margin'] == 0:
