@@ -13,43 +13,35 @@ def _clean_narrative(text: str) -> str:
     """
     Clean up AI-generated narrative text to fix formatting issues.
     """
-    # First, handle specific problematic patterns with direct string replacement
-    # This is more reliable than complex regex for these specific cases
-    
-    # Fix the specific pattern we're seeing: "10.00/GBwith3.5GBcap"
-    text = re.sub(r'(\d+\.\d+)/GBwith(\d+\.\d+)GBcap', r'\1/GB with \2GB cap', text)
-    
-    # Fix other common patterns (but be more careful not to break the above)
-    # Only apply these patterns if they don't match the specific pattern we already fixed
-    text = re.sub(r'(\d+\.\d+)/([A-Za-z]+)with(\d+\.\d+)([A-Za-z]+)', r'\1/\2 with \3\4', text)
-    # Don't apply this pattern to avoid breaking "GB" - it's too broad
-    # text = re.sub(r'(\d+\.\d+)/([A-Za-z]+)([A-Za-z]+)', r'\1/\2 \3', text)
-    text = re.sub(r'([A-Za-z]+)(\d+\.\d+)([A-Za-z]+)', r'\1 \2 \3', text)
-    
-    # Remove excessive line breaks and normalize whitespace
+    # Remove excessive line breaks and normalize whitespace first
     text = re.sub(r'\n+', ' ', text)
     text = re.sub(r'\s+', ' ', text)
     
-    # Fix any remaining "G B" spacing issues after whitespace normalization
+    # Fix specific problematic patterns that cause character splitting
+    # Fix the specific pattern: "10.00/GBwith3.5GBcap" -> "10.00/GB with 3.5GB cap"
+    text = re.sub(r'(\d+\.\d+)/GBwith(\d+\.\d+)GBcap', r'\1/GB with \2GB cap', text)
+    
+    # Fix "versus" spacing issues: "7,500versus8,000" -> "7,500 versus 8,000"
+    text = re.sub(r'(\d+,\d+)versus(\d+,\d+)', r'\1 versus \2', text)
+    text = re.sub(r'(\d+)versus(\d+)', r'\1 versus \2', text)
+    
+    # Fix comma spacing in numbers: "7 , 500" -> "7,500"
+    text = re.sub(r'(\d+)\s*,\s*(\d+)', r'\1,\2', text)
+    
+    # Fix decimal spacing: "7 . 5" -> "7.5"
+    text = re.sub(r'(\d+)\s*\.\s*(\d+)', r'\1.\2', text)
+    
+    # Fix any remaining "G B" spacing issues
     text = re.sub(r'G\s+B', 'GB', text)
-    
-    # Fix common formatting issues
-    text = re.sub(r'(\d+)\s*,\s*(\d+)', r'\1,\2', text)  # Fix comma spacing in numbers
-    text = re.sub(r'(\d+)\s*\(\s*(\d+)', r'\1 (\2', text)  # Fix parentheses spacing
-    text = re.sub(r'(\d+)\s*\.\s*(\d+)', r'\1.\2', text)  # Fix decimal spacing
-    
-    # Fix specific patterns that cause character splitting
-    # These patterns are commented out to avoid breaking "GB" into "G B"
-    # text = re.sub(r'(\d+\.\d+)/([A-Za-z]+)([A-Za-z]+)', r'\1/\2 \3', text)
-    # text = re.sub(r'([A-Za-z]+)(\d+\.\d+)([A-Za-z]+)', r'\1 \2 \3', text)
     
     # Remove bullet points and list formatting
     text = re.sub(r'^\s*[-*•]\s*', '', text, flags=re.MULTILINE)
     text = re.sub(r'^\s*\d+\.\s*', '', text, flags=re.MULTILINE)
     
-    # Clean up any remaining formatting artifacts
+    # Clean up formatting artifacts
     text = re.sub(r'\s*:\s*', ': ', text)
-    # Fix spacing around % and $ symbols - ensure proper spacing
+    
+    # Fix spacing around % and $ symbols
     text = re.sub(r'(\d+)\s*%', r'\1%', text)  # Remove space before % in numbers
     text = re.sub(r'%\s*([a-zA-Z])', r'% \1', text)  # Add space after % before letters
     text = re.sub(r'([a-zA-Z])\s*\$', r'\1 $', text)  # Add space before $ after letters
