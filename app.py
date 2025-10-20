@@ -587,8 +587,8 @@ def main():
         scenario_key = scenario_options[selected_scenario_key]
         scenario = get_scenario(scenario_key)
         st.session_state.current_scenario = scenario
-            # Trigger rerun to update the UI
-            st.experimental_rerun()
+        # Trigger rerun to update the UI
+        st.experimental_rerun()
     
     # Manual input controls
     st.sidebar.subheader("⚙️ Manual Configuration")
