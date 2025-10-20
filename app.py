@@ -566,12 +566,18 @@ def main():
     with col1:
         if st.button("✅ Profitable Example", help="Load profitable scenario", key="sidebar_profitable_example"):
             st.session_state.current_scenario = scenarios['profitable']
+            # Update SCO toggle to match scenario setting
+            if 'sco_enabled' in scenarios['profitable']:
+                st.session_state.sco_enabled = scenarios['profitable']['sco_enabled']
             # Trigger rerun to update the UI
             st.experimental_rerun()
     
     with col2:
         if st.button("❌ Unprofitable Example", help="Load unprofitable scenario", key="sidebar_unprofitable_example"):
             st.session_state.current_scenario = scenarios['unprofitable']
+            # Update SCO toggle to match scenario setting
+            if 'sco_enabled' in scenarios['unprofitable']:
+                st.session_state.sco_enabled = scenarios['unprofitable']['sco_enabled']
             # Trigger rerun to update the UI
             st.experimental_rerun()
     
@@ -593,6 +599,11 @@ def main():
         scenario = get_scenario(scenario_key)
         st.session_state.current_scenario = scenario
         st.session_state.last_selected_scenario = selected_scenario_key
+        
+        # Update SCO toggle to match scenario setting
+        if 'sco_enabled' in scenario:
+            st.session_state.sco_enabled = scenario['sco_enabled']
+        
         # Trigger rerun to update the UI
         st.experimental_rerun()
     
