@@ -601,6 +601,17 @@ def main():
                 st.session_state.monthly_usage_per_line = scenarios['profitable']['monthly_usage_per_line']
             else:
                 st.session_state.monthly_usage_per_line = 2.5  # Default usage
+            
+            # Clear optimization and AI results to prevent contamination
+            if 'optimization_result' in st.session_state:
+                del st.session_state.optimization_result
+            if 'optimization_completed' in st.session_state:
+                del st.session_state.optimization_completed
+            if 'trend_analysis_result' in st.session_state:
+                del st.session_state.trend_analysis_result
+            if 'forecast_results' in st.session_state:
+                del st.session_state.forecast_results
+            
             # Trigger rerun to update the UI
             st.experimental_rerun()
     
@@ -642,6 +653,17 @@ def main():
                 st.session_state.monthly_usage_per_line = scenarios['unprofitable']['monthly_usage_per_line']
             else:
                 st.session_state.monthly_usage_per_line = 2.5  # Default usage
+            
+            # Clear optimization and AI results to prevent contamination
+            if 'optimization_result' in st.session_state:
+                del st.session_state.optimization_result
+            if 'optimization_completed' in st.session_state:
+                del st.session_state.optimization_completed
+            if 'trend_analysis_result' in st.session_state:
+                del st.session_state.trend_analysis_result
+            if 'forecast_results' in st.session_state:
+                del st.session_state.forecast_results
+            
             # Trigger rerun to update the UI
             st.experimental_rerun()
     
@@ -699,6 +721,16 @@ def main():
             st.session_state.monthly_usage_per_line = scenario['monthly_usage_per_line']
         else:
             st.session_state.monthly_usage_per_line = 2.5  # Default usage
+        
+        # Clear optimization and AI results to prevent contamination
+        if 'optimization_result' in st.session_state:
+            del st.session_state.optimization_result
+        if 'optimization_completed' in st.session_state:
+            del st.session_state.optimization_completed
+        if 'trend_analysis_result' in st.session_state:
+            del st.session_state.trend_analysis_result
+        if 'forecast_results' in st.session_state:
+            del st.session_state.forecast_results
         
         # Trigger rerun to update the UI
         st.experimental_rerun()
