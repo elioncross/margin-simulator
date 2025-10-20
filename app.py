@@ -742,6 +742,7 @@ def main():
     if 'current_scenario' not in st.session_state:
         st.session_state.current_scenario = scenarios['profitable']
     
+    # Get current scenario AFTER all scenario loading logic has completed
     current = st.session_state.current_scenario
     
     # Input controls
