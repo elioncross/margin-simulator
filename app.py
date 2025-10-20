@@ -750,6 +750,16 @@ def main():
             st.write("**API Key Length:**", debug['api_key_length'])
             st.write("**API Key Prefix:**", debug['api_key_prefix'])
             st.write("**AI-related Env Vars:**", debug['all_env_vars'])
+        
+        # Additional secret testing
+        st.write("---")
+        st.write("**Secret Test:**")
+        try:
+            secret_value = st.secrets.get("GOOGLE_AI_API_KEY", "NOT_FOUND")
+            st.write("**Secret Value:**", secret_value[:10] + "..." if len(secret_value) > 10 else secret_value)
+            st.write("**Secret Present:**", secret_value != "NOT_FOUND")
+        except Exception as e:
+            st.write("**Secret Error:**", str(e))
     
     # Optimization section
     st.sidebar.markdown("---")

@@ -198,6 +198,16 @@ def _generate_google_ai_narrative(metrics: Dict[str, Any], context: Dict[str, An
     
     # Check if Google AI API key is available
     api_key = os.getenv('GOOGLE_AI_API_KEY')
+    
+    # Try Streamlit secrets as fallback
+    if not api_key:
+        try:
+            import streamlit as st
+            api_key = st.secrets.get("GOOGLE_AI_API_KEY")
+            print(f"🔍 DEBUG: Using Streamlit secrets for Google AI API key")
+        except:
+            pass
+    
     print(f"🔍 DEBUG: Google AI narrative generation - API key present: {bool(api_key)}")
     if not api_key:
         print("🔍 DEBUG: Google AI API key not found - using fallback templates")
@@ -469,6 +479,16 @@ def _generate_google_ai_optimization_narrative(optimization_result: Dict[str, An
     
     # Check if Google AI API key is available
     api_key = os.getenv('GOOGLE_AI_API_KEY')
+    
+    # Try Streamlit secrets as fallback
+    if not api_key:
+        try:
+            import streamlit as st
+            api_key = st.secrets.get("GOOGLE_AI_API_KEY")
+            print(f"🔍 DEBUG: Using Streamlit secrets for Google AI API key (optimization)")
+        except:
+            pass
+    
     print(f"🔍 DEBUG: Google AI optimization narrative - API key present: {bool(api_key)}")
     if not api_key:
         print("🔍 DEBUG: Google AI API key not found for optimization - using fallback templates")
@@ -618,6 +638,16 @@ def get_ai_narrative_status() -> Dict[str, Any]:
     
     # Check if Google AI API key is available
     api_key = os.getenv('GOOGLE_AI_API_KEY')
+    
+    # Try Streamlit secrets as fallback
+    if not api_key:
+        try:
+            import streamlit as st
+            api_key = st.secrets.get("GOOGLE_AI_API_KEY")
+            print(f"🔍 DEBUG: Using Streamlit secrets for Google AI API key (status check)")
+        except:
+            pass
+    
     print(f"🔍 DEBUG: Google AI API key check - Present: {bool(api_key)}, Length: {len(api_key) if api_key else 0}")
     google_ai_available = bool(api_key)
     
