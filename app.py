@@ -543,10 +543,6 @@ def main():
     # Sidebar for inputs
     st.sidebar.header("🎛️ Configuration")
     
-    # Logout button
-    if st.sidebar.button("🚪 Logout", key="logout_button"):
-        st.session_state["password_correct"] = False
-        st.experimental_rerun()
     
     # Load scenarios
     scenarios = get_all_scenarios()
@@ -738,74 +734,11 @@ def main():
         st.sidebar.info("📝 Using Smart Templates")
         st.sidebar.caption("Start Ollama for local AI narratives")
     
-    # Debug information (expandable)
-    with st.sidebar.expander("🔍 Debug Info", expanded=False):
-        st.write("**AI Status:**", ai_status['status'])
-        st.write("**Ollama:**", ai_status['ollama_available'])
-        st.write("**Google AI:**", ai_status['google_ai_available'])
-        
-        if 'debug_info' in ai_status:
-            debug = ai_status['debug_info']
-            st.write("**API Key Present:**", debug['api_key_present'])
-            st.write("**API Key Length:**", debug['api_key_length'])
-            st.write("**API Key Prefix:**", debug['api_key_prefix'])
-            st.write("**AI-related Env Vars:**", debug['all_env_vars'])
-        
-        # Additional secret testing
-        st.write("---")
-        st.write("**Secret Test:**")
-        try:
-            # Try multiple methods to get the secret
-            secret_value = None
-            
-            # Method 1: Direct access
-            try:
-                secret_value = st.secrets["GOOGLE_AI_API_KEY"]
-                st.write("**Method 1 (direct):** Success")
-            except:
-                st.write("**Method 1 (direct):** Failed")
-            
-            # Method 2: get() method
-            if not secret_value:
-                try:
-                    secret_value = st.secrets.get("GOOGLE_AI_API_KEY", "NOT_FOUND")
-                    if secret_value != "NOT_FOUND":
-                        st.write("**Method 2 (get):** Success")
-                    else:
-                        st.write("**Method 2 (get):** NOT_FOUND")
-                except:
-                    st.write("**Method 2 (get):** Failed")
-            
-            # Method 3: Nested access (current format)
-            if not secret_value or secret_value == "NOT_FOUND":
-                try:
-                    nested_value = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY", "NOT_FOUND")
-                    if nested_value != "NOT_FOUND":
-                        secret_value = nested_value
-                        st.write("**Method 3 (nested):** Success")
-                    else:
-                        st.write("**Method 3 (nested):** NOT_FOUND")
-                except:
-                    st.write("**Method 3 (nested):** Failed")
-            
-            # Method 4: Check if secrets object exists
-            try:
-                st.write("**Secrets object exists:**", hasattr(st, 'secrets'))
-                if hasattr(st, 'secrets'):
-                    st.write("**Secrets keys:**", list(st.secrets.keys()) if hasattr(st.secrets, 'keys') else "No keys method")
-            except:
-                st.write("**Secrets object check:** Failed")
-            
-            # Display result
-            if secret_value and secret_value != "NOT_FOUND":
-                st.write("**Secret Value:**", secret_value[:10] + "..." if len(secret_value) > 10 else secret_value)
-                st.write("**Secret Present:**", True)
-            else:
-                st.write("**Secret Value:**", "NOT_FOUND")
-                st.write("**Secret Present:**", False)
-                
-        except Exception as e:
-            st.write("**Secret Error:**", str(e))
+    # AI Status (simplified)
+    with st.sidebar.expander("🤖 AI Status", expanded=False):
+        st.write("**Status:**", ai_status['status'])
+        st.write("**Ollama:**", "✅ Available" if ai_status['ollama_available'] else "❌ Not Available")
+        st.write("**Google AI:**", "✅ Available" if ai_status['google_ai_available'] else "❌ Not Available")
     
     # Optimization section
     st.sidebar.markdown("---")

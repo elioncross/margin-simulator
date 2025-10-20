@@ -199,26 +199,28 @@ def _generate_google_ai_narrative(metrics: Dict[str, Any], context: Dict[str, An
     # Check if Google AI API key is available
     api_key = os.getenv('GOOGLE_AI_API_KEY')
     
-    # Try Streamlit secrets as fallback
+    # Try Streamlit secrets as fallback (only in cloud environments)
     if not api_key:
         try:
             import streamlit as st
-            # Try direct access first
-            api_key = st.secrets.get("GOOGLE_AI_API_KEY")
-            if not api_key:
-                # Try nested access (current format)
-                api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
-            if api_key:
-                print(f"🔍 DEBUG: Using Streamlit secrets for Google AI API key")
+            # Check if we're in a cloud environment to avoid local secrets warnings
+            is_cloud_env = (
+                'STREAMLIT_CLOUD' in os.environ or 
+                'STREAMLIT_SHARING' in os.environ or
+                hasattr(st, 'secrets') and hasattr(st.secrets, 'get')
+            )
+            
+            if is_cloud_env:
+                # Try direct access first
+                api_key = st.secrets.get("GOOGLE_AI_API_KEY")
+                if not api_key:
+                    # Try nested access (current format)
+                    api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
         except:
             pass
     
-    print(f"🔍 DEBUG: Google AI narrative generation - API key present: {bool(api_key)}")
     if not api_key:
-        print("🔍 DEBUG: Google AI API key not found - using fallback templates")
         return None
-    
-    print(f"🔍 DEBUG: Using Google AI for {view_type} narrative")
     
     # Prepare the prompt based on view type
     if view_type == "customer":
@@ -485,26 +487,28 @@ def _generate_google_ai_optimization_narrative(optimization_result: Dict[str, An
     # Check if Google AI API key is available
     api_key = os.getenv('GOOGLE_AI_API_KEY')
     
-    # Try Streamlit secrets as fallback
+    # Try Streamlit secrets as fallback (only in cloud environments)
     if not api_key:
         try:
             import streamlit as st
-            # Try direct access first
-            api_key = st.secrets.get("GOOGLE_AI_API_KEY")
-            if not api_key:
-                # Try nested access (current format)
-                api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
-            if api_key:
-                print(f"🔍 DEBUG: Using Streamlit secrets for Google AI API key (optimization)")
+            # Check if we're in a cloud environment to avoid local secrets warnings
+            is_cloud_env = (
+                'STREAMLIT_CLOUD' in os.environ or 
+                'STREAMLIT_SHARING' in os.environ or
+                hasattr(st, 'secrets') and hasattr(st.secrets, 'get')
+            )
+            
+            if is_cloud_env:
+                # Try direct access first
+                api_key = st.secrets.get("GOOGLE_AI_API_KEY")
+                if not api_key:
+                    # Try nested access (current format)
+                    api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
         except:
             pass
     
-    print(f"🔍 DEBUG: Google AI optimization narrative - API key present: {bool(api_key)}")
     if not api_key:
-        print("🔍 DEBUG: Google AI API key not found for optimization - using fallback templates")
         return None
-    
-    print("🔍 DEBUG: Using Google AI for optimization narrative")
     
     if not optimization_result.get('feasible', False):
         prompt = f"""As a business analyst, provide a concise analysis of why no feasible optimization solution was found:
@@ -649,25 +653,27 @@ def get_ai_narrative_status() -> Dict[str, Any]:
     # Check if Google AI API key is available
     api_key = os.getenv('GOOGLE_AI_API_KEY')
     
-    # Try Streamlit secrets as fallback
+    # Try Streamlit secrets as fallback (only in cloud environments)
     if not api_key:
         try:
             import streamlit as st
-            # Try direct access first
-            api_key = st.secrets.get("GOOGLE_AI_API_KEY")
-            if not api_key:
-                # Try nested access (current format)
-                api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
-            if api_key:
-                print(f"🔍 DEBUG: Using Streamlit secrets for Google AI API key (status check)")
+            # Check if we're in a cloud environment to avoid local secrets warnings
+            is_cloud_env = (
+                'STREAMLIT_CLOUD' in os.environ or 
+                'STREAMLIT_SHARING' in os.environ or
+                hasattr(st, 'secrets') and hasattr(st.secrets, 'get')
+            )
+            
+            if is_cloud_env:
+                # Try direct access first
+                api_key = st.secrets.get("GOOGLE_AI_API_KEY")
+                if not api_key:
+                    # Try nested access (current format)
+                    api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
         except:
             pass
     
-    print(f"🔍 DEBUG: Google AI API key check - Present: {bool(api_key)}, Length: {len(api_key) if api_key else 0}")
     google_ai_available = bool(api_key)
-    
-    if not api_key:
-        print("🔍 DEBUG: Google AI API key not found - using fallback templates")
     
     # Debug information for troubleshooting
     debug_info = {
