@@ -1086,10 +1086,7 @@ def main():
                     else:
                         ai_label = "📝 **Smart Template**"
                     
-                    # Debug: Show raw narrative before display
-                    st.write("🔍 DEBUG - Raw AI narrative:", repr(ai_narrative))
-                    
-                    # Try displaying text separately to avoid browser rendering issues
+                    # Display text separately to avoid browser rendering issues
                     if metrics['margin'] > 0:
                         st.success(ai_label + ":")
                         st.write(ai_narrative)

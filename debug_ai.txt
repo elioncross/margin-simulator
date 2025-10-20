@@ -1,0 +1,54 @@
+🚨 DEBUG: generate_ai_narrative called for customer view
+🔍 DEBUG: Google AI raw narrative: 'With 96% service coverage across your 500 lines, we're empowering your enterprise with reliable connectivity and driving exceptional business outcomes! 🚀 While the 5GB data cap with throttling ensures...'
+🔍 DEBUG: Google AI cleaned narrative: 'With 96% service coverage across your 500 lines, we're empowering your enterprise with reliable connectivity and driving exceptional business outcomes! 🚀 While the 5GB data cap with throttling ensures...'
+🚨 DEBUG: generate_ai_narrative called for financial view
+🚨 DEBUG: generate_ai_narrative called for customer view
+🔍 DEBUG: Google AI raw narrative: 'The connectivity service demonstrates acceptable financial performance, achieving budget on revenue with a 32.5% margin. However, the impact of throttling on the Enterprise vertical needs further inve...'
+🔍 DEBUG: Google AI cleaned narrative: 'The connectivity service demonstrates acceptable financial performance, achieving budget on revenue with a 32.5% margin. However, the impact of throttling on the Enterprise vertical needs further inve...'
+🔍 DEBUG: Google AI raw narrative: 'With 96% service coverage across your 500 lines, we're delivering exceptional connectivity for your enterprise customers! 🎉 While throttling is enabled to ensure fair usage within the 5GB data cap per...'
+🔍 DEBUG: Google AI cleaned narrative: 'With 96% service coverage across your 500 lines, we're delivering exceptional connectivity for your enterprise customers! 🎉 While throttling is enabled to ensure fair usage within the 5GB data cap per...'
+🚨 DEBUG: generate_ai_narrative called for financial view
+🔍 DEBUG: Google AI raw narrative: 'The connectivity service for Enterprise is performing as expected from a revenue perspective, hitting its $12,000 budget. However, the 32.5% margin warrants further investigation to identify potential...'
+🔍 DEBUG: Google AI cleaned narrative: 'The connectivity service for Enterprise is performing as expected from a revenue perspective, hitting its $12,000 budget. However, the 32.5% margin warrants further investigation to identify potential...'
+🚨 DEBUG: generate_ai_narrative called for customer view
+🔍 DEBUG: Google AI raw narrative: 'Congratulations! 🎉 Your enterprise solution featuring 500 lines with generous 8GB data caps and disabled throttling delivers 100% service coverage, ensuring seamless connectivity for all your customer...'
+🔍 DEBUG: Google AI cleaned narrative: 'Congratulations! 🎉 Your enterprise solution featuring 500 lines with generous 8GB data caps and disabled throttling delivers 100% service coverage, ensuring seamless connectivity for all your customer...'
+🚨 DEBUG: generate_ai_narrative called for financial view
+🔍 DEBUG: Google AI raw narrative: 'The connectivity service for Enterprise customers is underperforming with a revenue shortfall of $500 against budget and a significantly negative margin of -80%, despite achieving full service coverag...'
+🔍 DEBUG: Google AI cleaned narrative: 'The connectivity service for Enterprise customers is underperforming with a revenue shortfall of $500 against budget and a significantly negative margin of -80%, despite achieving full service coverag...'
+🚨 DEBUG: generate_ai_narrative called for customer view
+🔍 DEBUG: Google AI raw narrative: 'Congratulations on achieving 96% service coverage for your 500 enterprise lines! 🎉 With a 5.0GB data cap and throttling enabled, we're ensuring cost-effective connectivity and optimal performance for ...'
+🔍 DEBUG: Google AI cleaned narrative: 'Congratulations on achieving 96% service coverage for your 500 enterprise lines! 🎉 With a 5.0GB data cap and throttling enabled, we're ensuring cost-effective connectivity and optimal performance for ...'
+🚨 DEBUG: generate_ai_narrative called for financial view
+🔍 DEBUG: Google AI raw narrative: 'The connectivity service performance shows revenue perfectly aligned with budget, but the 32.5% margin warrants further investigation to ensure profitability targets are met, especially within the Ent...'
+🔍 DEBUG: Google AI cleaned narrative: 'The connectivity service performance shows revenue perfectly aligned with budget, but the 32.5% margin warrants further investigation to ensure profitability targets are met, especially within the Ent...'
+🚨 DEBUG: generate_ai_narrative called for customer view
+🔍 DEBUG: Google AI raw narrative: 'Congratulations! 🎉 Your enterprise solution, boasting 500 lines with generous 8GB data caps and 100% service coverage, is perfectly positioned to empower your workforce. With throttling disabled, your...'
+🔍 DEBUG: Google AI cleaned narrative: 'Congratulations! 🎉 Your enterprise solution, boasting 500 lines with generous 8GB data caps and 100% service coverage, is perfectly positioned to empower your workforce. With throttling disabled, your...'
+🚨 DEBUG: generate_ai_narrative called for financial view
+🔍 DEBUG: Google AI raw narrative: 'The connectivity service for Enterprise customers exhibits concerning financial performance despite full service coverage and unthrottled bandwidth. Revenue is slightly below budget, but the drastical...'
+🔍 DEBUG: Google AI cleaned narrative: 'The connectivity service for Enterprise customers exhibits concerning financial performance despite full service coverage and unthrottled bandwidth. Revenue is slightly below budget, but the drastical...'
+🚨 DEBUG: generate_ai_narrative called for customer view
+🔍 DEBUG: Google AI raw narrative: '🎉 Congratulations on achieving 100% service coverage for your 500 enterprise lines! Each line now enjoys a generous 8.0GB data cap with throttling disabled, ensuring optimal performance. This comprehe...'
+🔍 DEBUG: Google AI cleaned narrative: '🎉 Congratulations on achieving 100% service coverage for your 500 enterprise lines! Each line now enjoys a generous 8.0GB data cap with throttling disabled, ensuring optimal performance. This comprehe...'
+🚨 DEBUG: generate_ai_narrative called for financial view
+🔍 DEBUG: Google AI raw narrative: 'The connectivity service underperformed against revenue targets, achieving $7,500 against an $8,000 budget, while service coverage reached 100% for Enterprise customers. The significantly negative 80%...'
+🔍 DEBUG: Google AI cleaned narrative: 'The connectivity service underperformed against revenue targets, achieving $7,500 against an $8,000 budget, while service coverage reached 100% for Enterprise customers. The significantly negative 80%...'
+🚨 DEBUG: generate_ai_narrative called for customer view
+🔍 DEBUG: Google AI raw narrative: 'This connectivity solution offers your enterprise 500 lines, each with a generous 8GB data allowance, ensuring seamless operations. 🎉 Achieving 100% service coverage means every customer benefits from...'
+🔍 DEBUG: Google AI cleaned narrative: 'This connectivity solution offers your enterprise 500 lines, each with a generous 8GB data allowance, ensuring seamless operations. 🎉 Achieving 100% service coverage means every customer benefits from...'
+🚨 DEBUG: generate_ai_narrative called for financial view
+🔍 DEBUG: Google AI raw narrative: 'The connectivity service underperformed against its revenue budget, achieving $7,500 versus $8,000, coupled with a concerning -80% margin, signaling significant cost issues within the Enterprise verti...'
+🔍 DEBUG: Google AI cleaned narrative: 'The connectivity service underperformed against its revenue budget, achieving $7,500 versus $8,000, coupled with a concerning -80% margin, signaling significant cost issues within the Enterprise verti...'
+🚨 DEBUG: generate_ai_narrative called for customer view
+🔍 DEBUG: Google AI raw narrative: 'We're excited to deliver robust connectivity to your enterprise with 500 lines, each featuring a 5.0GB data cap, ensuring predictable costs. Our 96% service coverage means reliable access for almost a...'
+🔍 DEBUG: Google AI cleaned narrative: 'We're excited to deliver robust connectivity to your enterprise with 500 lines, each featuring a 5.0GB data cap, ensuring predictable costs. Our 96% service coverage means reliable access for almost a...'
+🚨 DEBUG: generate_ai_narrative called for financial view
+🔍 DEBUG: Google AI raw narrative: 'The connectivity service performance shows revenue aligning with budget, indicating stable sales within the Enterprise vertical. However, the 32.5% margin warrants further investigation to identify po...'
+🔍 DEBUG: Google AI cleaned narrative: 'The connectivity service performance shows revenue aligning with budget, indicating stable sales within the Enterprise vertical. However, the 32.5% margin warrants further investigation to identify po...'
+🚨 DEBUG: generate_ai_narrative called for customer view
+🔍 DEBUG: Google AI raw narrative: 'This connectivity solution provides your enterprise with robust and reliable access, ensuring 100% service coverage across all 500 lines. With a generous 8GB data cap per line and throttling disabled,...'
+🔍 DEBUG: Google AI cleaned narrative: 'This connectivity solution provides your enterprise with robust and reliable access, ensuring 100% service coverage across all 500 lines. With a generous 8GB data cap per line and throttling disabled,...'
+🚨 DEBUG: generate_ai_narrative called for financial view
+🔍 DEBUG: Google AI raw narrative: 'The connectivity service for Enterprise customers is underperforming financially, exhibiting a significant negative margin of -80% despite achieving 100% service coverage and generating $7,500 in reve...'
+🔍 DEBUG: Google AI cleaned narrative: 'The connectivity service for Enterprise customers is underperforming financially, exhibiting a significant negative margin of -80% despite achieving 100% service coverage and generating $7,500 in reve...'
