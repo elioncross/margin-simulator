@@ -566,20 +566,14 @@ def main():
     with col1:
         if st.button("✅ Profitable Example", help="Load profitable scenario", key="sidebar_profitable_example"):
             st.session_state.current_scenario = scenarios['profitable']
-            # Use version-compatible rerun method
-try:
-    st.rerun()
-except AttributeError:
-    st.experimental_rerun()
+            # Trigger rerun to update the UI
+            st.experimental_rerun()
     
     with col2:
         if st.button("❌ Unprofitable Example", help="Load unprofitable scenario", key="sidebar_unprofitable_example"):
             st.session_state.current_scenario = scenarios['unprofitable']
-            # Use version-compatible rerun method
-try:
-    st.rerun()
-except AttributeError:
-    st.experimental_rerun()
+            # Trigger rerun to update the UI
+            st.experimental_rerun()
     
     # Dropdown for all scenarios
     scenario_options = {f"{k}: {v['name']}": k for k, v in scenarios.items()}
@@ -593,11 +587,8 @@ except AttributeError:
         scenario_key = scenario_options[selected_scenario_key]
         scenario = get_scenario(scenario_key)
         st.session_state.current_scenario = scenario
-        # Use version-compatible rerun method
-try:
-    st.rerun()
-except AttributeError:
-    st.experimental_rerun()
+            # Trigger rerun to update the UI
+            st.experimental_rerun()
     
     # Manual input controls
     st.sidebar.subheader("⚙️ Manual Configuration")
@@ -804,11 +795,8 @@ except AttributeError:
             else:
                 st.sidebar.error("❌ No feasible solution found. Try relaxing constraints.")
             # Force rerun to show notification
-            # Use version-compatible rerun method
-try:
-    st.rerun()
-except AttributeError:
-    st.experimental_rerun()
+            # Trigger rerun to update the UI
+            st.experimental_rerun()
     
     # Calculate metrics (use SCO if enabled)
     if sco_enabled:
@@ -1213,11 +1201,8 @@ except AttributeError:
                     current_scenario['customer_price'] = result['recommended_customer_price']
                     current_scenario['cap'] = result['recommended_cap']
                     st.session_state.current_scenario = current_scenario
-                    # Use version-compatible rerun method
-                    try:
-                        st.rerun()
-                    except AttributeError:
-                        st.experimental_rerun()
+                    # Trigger rerun to update the UI
+                    st.experimental_rerun()
             else:
                 st.error("❌ " + result['message'])
                 st.info("💡 Try relaxing your minimum coverage or margin requirements")
