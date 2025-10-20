@@ -1,0 +1,461 @@
+"""
+Margin Impact Simulator - Model Layer
+Contains formulas for usage, cost, revenue, margin, and coverage calculations.
+Enhanced with Smart Cost Optimization (SCO) capabilities.
+"""
+
+def calculate_metrics(students, cap, budget, carrier_rate, customer_price, policy, throttling, monthly_usage_per_line=2.5, base_plan_gb=None, overage_rate=15.0):
+    """
+    Calculate key metrics for the margin impact simulator.
+    
+    Args:
+        students (int): Number of lines
+        cap (float): Data cap per line in GB
+        budget (float): Budget in dollars
+        carrier_rate (float): Carrier rate in $/GB
+        customer_price (float): Customer pricing in $/GB
+        policy (str): Vertical - "Public Sector (Schools)", "Retail (Households)", or "Enterprise"
+        throttling (bool): Whether throttling is enabled
+        monthly_usage_per_line (float): Average monthly data usage per line (GB)
+        base_plan_gb (float): Base plan GB per line (carrier's actual plan)
+        overage_rate (float): Overage rate per GB when exceeding base plan
+    
+    Returns:
+        dict: Dictionary containing usage, cost, revenue, margin, coverage
+    """
+    
+    # Policy factor mapping to business verticals:
+    # Public Sector (Schools) = 1.0, Retail (Households) = 0.8, Enterprise = 0.9
+    if policy == "Public Sector (Schools)":
+        policy_factor = 1.0
+    elif policy == "Retail (Households)":
+        policy_factor = 0.8
+    elif policy == "Enterprise":
+        policy_factor = 0.9
+    else:
+        # Fallback for legacy values
+        policy_factor = 1.0 if policy == "Per Student" else 0.8
+    
+    # Efficiency factor: Throttling On = 0.9, Off = 1.0
+    efficiency_factor = 0.9 if throttling else 1.0
+    
+    # Calculate actual usage based on real consumption patterns
+    # This represents the actual data consumed, not the cap offered
+    total_monthly_usage = students * monthly_usage_per_line * policy_factor * efficiency_factor
+    
+    # If base_plan_gb is provided, use the same logic as SCO
+    if base_plan_gb is not None:
+        # Calculate base plan coverage
+        base_plan_coverage = students * base_plan_gb
+        
+        # Calculate overage (actual usage - base plan coverage)
+        if total_monthly_usage > base_plan_coverage:
+            overage_gb = total_monthly_usage - base_plan_coverage
+            base_usage = base_plan_coverage
+        else:
+            overage_gb = 0
+            base_usage = total_monthly_usage
+        
+        # Calculate carrier cost with overage charges
+        base_carrier_cost = base_usage * carrier_rate
+        overage_carrier_cost = overage_gb * overage_rate
+        carrier_cost = base_carrier_cost + overage_carrier_cost
+        
+        # Usage is the total actual consumption
+        usage = total_monthly_usage
+    else:
+        # Legacy behavior: usage limited by customer cap
+        usage = min(total_monthly_usage, students * cap)
+        carrier_cost = usage * carrier_rate
+    
+    # Calculate revenue based on customer's budget constraint
+    # Customer has a budget limit - they can't pay more than their budget
+    monthly_revenue_per_line = customer_price  # Customer pays fixed monthly fee per line
+    total_monthly_revenue = students * monthly_revenue_per_line
+    # Revenue is limited by customer's budget
+    revenue = min(budget, total_monthly_revenue)
+    
+    # Calculate margin (avoid division by zero)
+    if revenue > 0:
+        margin = (revenue - carrier_cost) / revenue
+    else:
+        margin = 0.0
+    
+    # Calculate coverage percentage (based on plan capacity)
+    max_potential_revenue = students * customer_price
+    if max_potential_revenue > 0:
+        coverage = (revenue / max_potential_revenue) * 100
+    else:
+        coverage = 0.0
+    
+    # Calculate budget utilization (how much of customer's budget is being used)
+    budget_utilization = (revenue / budget) * 100 if budget > 0 else 0
+    budget_remaining = budget - revenue
+    
+    return {
+        'usage': usage,
+        'carrier_cost': carrier_cost,
+        'revenue': revenue,
+        'margin': margin,
+        'coverage': coverage,
+        'policy_factor': policy_factor,
+        'efficiency_factor': efficiency_factor,
+        'budget_utilization': budget_utilization,
+        'budget_remaining': budget_remaining
+    }
+
+def optimize_pricing_and_caps(students, current_cap, budget, carrier_rate, current_customer_price, 
+                             policy, throttling, min_coverage=80.0, min_margin=0.0, 
+                             sco_enabled=False, base_plan_gb=None, sco_efficiency=0.85, 
+                             overage_rate=15.0, plan_switching_cost=2.0, monthly_usage_per_line=2.5):
+    """
+    Optimize customer pricing and data caps for maximum profitability.
+    
+    This is much more intuitive than optimizing policy/throttling - we optimize
+    the actual business variables that matter: pricing and data allowances.
+    
+    Now supports SCO (Smart Cost Optimization) when enabled.
+    
+    Objective: Maximize Margin = (Revenue - CarrierCost) / Revenue
+    Constraints:
+    - Revenue ≤ Budget (customer's budget limit)
+    - Coverage ≥ Minimum Coverage
+    - Margin ≥ Minimum Margin (to ensure profitability)
+    
+    Args:
+        students (int): Number of lines
+        current_cap (float): Current data cap per line in GB
+        budget (float): Budget in dollars
+        carrier_rate (float): Carrier rate in $/GB (fixed)
+        current_customer_price (float): Current customer pricing in $/month per line
+        policy (str): Vertical - "Public Sector (Schools)", "Retail (Households)", or "Enterprise" (fixed)
+        throttling (bool): Throttling setting (fixed)
+        min_coverage (float): Minimum coverage percentage required
+        min_margin (float): Minimum margin required (default 0%)
+        sco_enabled (bool): Whether SCO is enabled
+        base_plan_gb (float): Base plan size for SCO (if None, uses current_cap)
+        sco_efficiency (float): SCO efficiency (0.0-1.0)
+        overage_rate (float): Overage rate in $/GB
+        plan_switching_cost (float): Plan switching cost per line
+    
+    Returns:
+        dict: Optimization results containing:
+            - recommended_customer_price (float): Optimal customer price per line per month
+            - recommended_cap (float): Optimal data cap
+            - metrics (dict): Calculated metrics for optimal solution
+            - feasible (bool): Whether a feasible solution was found
+            - message (str): Status message
+            - alternatives (list): Top 5 alternative solutions
+            - improvement (dict): Improvement over current settings
+    """
+    
+    # Set default base plan if not provided
+    if base_plan_gb is None:
+        base_plan_gb = current_cap
+    
+    # Define search ranges for pricing and caps
+    # Pricing: ±50% of current price, in $2.50 increments (per-line monthly pricing)
+    price_min = max(10.0, current_customer_price * 0.5)
+    price_max = min(100.0, current_customer_price * 1.5)
+    price_step = 2.50
+    
+    # Data caps: ±30% of current cap, in 0.5GB increments
+    cap_min = max(1.0, current_cap * 0.7)
+    cap_max = min(15.0, current_cap * 1.3)
+    cap_step = 0.5
+    
+    best_solution = None
+    best_margin = -float('inf')
+    all_solutions = []
+    
+    # Generate search space
+    prices = [round(price_min + i * price_step, 2) for i in range(int((price_max - price_min) / price_step) + 1)]
+    caps = [round(cap_min + i * cap_step, 1) for i in range(int((cap_max - cap_min) / cap_step) + 1)]
+    
+    # Limit search space to reasonable size (max 100 combinations)
+    if len(prices) * len(caps) > 100:
+        # Sample more intelligently
+        prices = [round(price_min + i * (price_max - price_min) / 9, 2) for i in range(10)]
+        caps = [round(cap_min + i * (cap_max - cap_min) / 9, 1) for i in range(10)]
+    
+    # Search over pricing and cap combinations
+    for customer_price in prices:
+        for cap in caps:
+            # Calculate metrics for this combination (SCO-aware)
+            if sco_enabled:
+                metrics = calculate_sco_metrics(
+                    students, base_plan_gb, cap, budget, carrier_rate, 
+                    customer_price, policy, throttling, sco_enabled=True,
+                    sco_efficiency=sco_efficiency, overage_rate=overage_rate, 
+                    plan_switching_cost=plan_switching_cost, monthly_usage_per_line=monthly_usage_per_line
+                )
+            else:
+                metrics = calculate_metrics(
+                    students, cap, budget, carrier_rate, 
+                    customer_price, policy, throttling, monthly_usage_per_line,
+                    base_plan_gb, overage_rate
+                )
+            
+            # Check constraints
+            # Budget constraint: revenue should not exceed customer's budget
+            budget_constraint = metrics['revenue'] <= budget
+            coverage_constraint = metrics['coverage'] >= min_coverage
+            margin_constraint = metrics['margin'] >= min_margin
+            
+            # Store solution for analysis
+            solution = {
+                'customer_price': customer_price,
+                'cap': cap,
+                'metrics': metrics,
+                'feasible': budget_constraint and coverage_constraint and margin_constraint
+            }
+            all_solutions.append(solution)
+            
+            # Update best solution if constraints are met and margin is better
+            if solution['feasible'] and metrics['margin'] > best_margin:
+                best_margin = metrics['margin']
+                best_solution = solution
+    
+        # Calculate current metrics for comparison (SCO-aware)
+        if sco_enabled:
+            current_metrics = calculate_sco_metrics(
+                students, base_plan_gb, current_cap, budget, carrier_rate, 
+                current_customer_price, policy, throttling, sco_enabled=True,
+                sco_efficiency=sco_efficiency, overage_rate=overage_rate, 
+                plan_switching_cost=plan_switching_cost, monthly_usage_per_line=monthly_usage_per_line
+            )
+    else:
+        current_metrics = calculate_metrics(
+            students, current_cap, budget, carrier_rate, 
+            current_customer_price, policy, throttling, monthly_usage_per_line,
+            base_plan_gb, overage_rate
+        )
+    
+    # Prepare results
+    if best_solution is not None:
+        # Sort all feasible solutions by margin (descending)
+        feasible_solutions = [s for s in all_solutions if s['feasible']]
+        feasible_solutions.sort(key=lambda x: x['metrics']['margin'], reverse=True)
+        
+        # Calculate improvement
+        margin_improvement = best_solution['metrics']['margin'] - current_metrics['margin']
+        revenue_improvement = best_solution['metrics']['revenue'] - current_metrics['revenue']
+        
+        sco_status = " (SCO-enabled)" if sco_enabled else ""
+        return {
+            'recommended_customer_price': best_solution['customer_price'],
+            'recommended_cap': best_solution['cap'],
+            'metrics': best_solution['metrics'],
+            'feasible': True,
+            'message': f"Optimal pricing found{sco_status}: ${best_solution['customer_price']:.2f}/month per line, {best_solution['cap']:.1f}GB cap → {best_solution['metrics']['margin']:.1%} margin",
+            'alternatives': feasible_solutions[:5],  # Top 5 alternatives
+            'total_combinations_tested': len(all_solutions),
+            'feasible_combinations': len(feasible_solutions),
+            'improvement': {
+                'margin_improvement': margin_improvement,
+                'revenue_improvement': revenue_improvement,
+                'current_margin': current_metrics['margin'],
+                'current_revenue': current_metrics['revenue']
+            }
+        }
+    else:
+        # No feasible solution found
+        sco_status = " (SCO-enabled)" if sco_enabled else ""
+        return {
+            'recommended_customer_price': None,
+            'recommended_cap': None,
+            'metrics': None,
+            'feasible': False,
+            'message': f"No feasible solution found{sco_status}. Try relaxing constraints (min coverage: {min_coverage}%, min margin: {min_margin:.1%})",
+            'alternatives': [],
+            'total_combinations_tested': len(all_solutions),
+            'feasible_combinations': 0,
+            'improvement': {
+                'margin_improvement': 0,
+                'revenue_improvement': 0,
+                'current_margin': current_metrics['margin'],
+                'current_revenue': current_metrics['revenue']
+            }
+        }
+
+def calculate_sco_metrics(students, base_plan_gb, customer_cap, budget, carrier_rate, 
+                         customer_price, policy, throttling, sco_enabled=True, 
+                         sco_efficiency=0.85, overage_rate=15.0, plan_switching_cost=2.0,
+                         monthly_usage_per_line=2.5):
+    """
+    Calculate metrics with Smart Cost Optimization (SCO) capabilities.
+    
+    SCO Model:
+    - Customer sees "unlimited" experience (customer_cap)
+    - Internal base plan is smaller (base_plan_gb)
+    - SCO prevents overages by switching plans dynamically
+    - Overage charges apply when SCO can't prevent them
+    
+    Args:
+        students (int): Number of lines
+        base_plan_gb (float): Base plan size per line in GB (internal)
+        customer_cap (float): What customer sees as their data allowance
+        budget (float): Budget in dollars
+        carrier_rate (float): Base carrier rate in $/GB
+        customer_price (float): Customer pricing in $/month per line
+        policy (str): Vertical - "Public Sector (Schools)", "Retail (Households)", or "Enterprise"
+        throttling (bool): Whether throttling is enabled
+        sco_enabled (bool): Whether SCO is enabled
+        sco_efficiency (float): How well SCO prevents overages (0.0-1.0)
+        overage_rate (float): Rate for overage charges in $/GB
+        plan_switching_cost (float): Cost per line per plan switch
+    
+    Returns:
+        dict: Dictionary containing SCO metrics and analysis
+    """
+    
+    # Policy factor mapping to business verticals
+    if policy == "Public Sector (Schools)":
+        policy_factor = 1.0
+    elif policy == "Retail (Households)":
+        policy_factor = 0.8
+    elif policy == "Enterprise":
+        policy_factor = 0.9
+    else:
+        policy_factor = 1.0 if policy == "Per Student" else 0.8
+    
+    # Efficiency factor: Throttling On = 0.9, Off = 1.0
+    efficiency_factor = 0.9 if throttling else 1.0
+    
+    # Calculate actual monthly usage (realistic consumption pattern)
+    total_monthly_usage = students * monthly_usage_per_line * policy_factor * efficiency_factor
+    
+    # Calculate base plan coverage
+    base_plan_coverage = students * base_plan_gb
+    
+    # Calculate overage (actual usage - base plan coverage)
+    if total_monthly_usage > base_plan_coverage:
+        potential_overage = total_monthly_usage - base_plan_coverage
+        base_usage = base_plan_coverage
+    else:
+        potential_overage = 0
+        base_usage = total_monthly_usage
+    
+    if sco_enabled:
+        # SCO prevents some overage
+        actual_overage = potential_overage * (1 - sco_efficiency)
+        overage_savings = potential_overage - actual_overage
+        
+        # Plan switching costs (assume 10% of lines switch plans monthly)
+        switching_frequency = 0.1  # 10% of lines switch plans
+        switching_cost = students * plan_switching_cost * switching_frequency
+        
+        # SCO operational cost (assume $0.20 per line per month for SCO service)
+        sco_operational_cost = students * 0.2
+    else:
+        # No SCO - full overage charges
+        actual_overage = potential_overage
+        overage_savings = 0
+        switching_cost = 0
+        sco_operational_cost = 0
+    
+    # Calculate total usage and costs
+    total_usage = total_monthly_usage  # This is the actual usage regardless of SCO
+    base_carrier_cost = base_usage * carrier_rate
+    overage_carrier_cost = actual_overage * overage_rate
+    total_carrier_cost = base_carrier_cost + overage_carrier_cost + switching_cost + sco_operational_cost
+    
+    # Customer revenue (based on customer's budget constraint)
+    # Customer has a budget limit - they can't pay more than their budget
+    monthly_revenue_per_line = customer_price  # Customer pays fixed monthly fee per line
+    total_monthly_revenue = students * monthly_revenue_per_line
+    # Revenue is limited by customer's budget
+    revenue = min(budget, total_monthly_revenue)
+    
+    # Calculate margin
+    if revenue > 0:
+        margin = (revenue - total_carrier_cost) / revenue
+    else:
+        margin = 0.0
+    
+    # Calculate coverage percentage (based on plan capacity)
+    max_potential_revenue = students * customer_price
+    if max_potential_revenue > 0:
+        coverage = (revenue / max_potential_revenue) * 100
+    else:
+        coverage = 0.0
+    
+    # Calculate traditional metrics for comparison
+    traditional_metrics = calculate_metrics(
+        students, customer_cap, budget, carrier_rate, customer_price, policy, throttling, monthly_usage_per_line,
+        base_plan_gb, overage_rate
+    )
+    
+    # Calculate budget utilization (how much of customer's budget is being used)
+    budget_utilization = (revenue / budget) * 100 if budget > 0 else 0
+    budget_remaining = budget - revenue
+    
+    return {
+        'usage': total_usage,
+        'base_usage': base_usage,
+        'potential_overage': potential_overage,
+        'actual_overage': actual_overage,
+        'overage_savings': overage_savings,
+        'carrier_cost': total_carrier_cost,
+        'base_carrier_cost': base_carrier_cost,
+        'overage_carrier_cost': overage_carrier_cost,
+        'switching_cost': switching_cost,
+        'sco_operational_cost': sco_operational_cost,
+        'revenue': revenue,
+        'margin': margin,
+        'coverage': coverage,
+        'policy_factor': policy_factor,
+        'efficiency_factor': efficiency_factor,
+        'sco_enabled': sco_enabled,
+        'sco_efficiency': sco_efficiency,
+        'traditional_metrics': traditional_metrics,
+        'budget_utilization': budget_utilization,
+        'budget_remaining': budget_remaining,
+        'sco_savings': {
+            'overage_cost_savings': overage_savings * overage_rate,
+            'total_savings': overage_savings * overage_rate - sco_operational_cost - switching_cost,
+            'roi': (overage_savings * overage_rate - sco_operational_cost - switching_cost) / max(sco_operational_cost + switching_cost, 1)
+        }
+    }
+
+def compare_sco_vs_traditional(students, base_plan_gb, customer_cap, budget, carrier_rate, 
+                              customer_price, policy, throttling, sco_efficiency=0.85, 
+                              overage_rate=15.0, plan_switching_cost=2.0, monthly_usage_per_line=2.5):
+    """
+    Compare SCO-enabled vs non-SCO-enabled plans.
+    
+    Returns:
+        dict: Comparison analysis between SCO-enabled and non-SCO-enabled approaches
+    """
+    
+    # Calculate SCO metrics
+    sco_metrics = calculate_sco_metrics(
+        students, base_plan_gb, customer_cap, budget, carrier_rate, 
+        customer_price, policy, throttling, sco_enabled=True,
+        sco_efficiency=sco_efficiency, overage_rate=overage_rate, 
+        plan_switching_cost=plan_switching_cost, monthly_usage_per_line=monthly_usage_per_line
+    )
+    
+    # Calculate non-SCO metrics (same scenario without SCO)
+    non_sco_metrics = calculate_metrics(
+        students, customer_cap, budget, carrier_rate, customer_price, policy, throttling, monthly_usage_per_line,
+        base_plan_gb, overage_rate
+    )
+    
+    # Calculate improvements
+    cost_improvement = non_sco_metrics['carrier_cost'] - sco_metrics['carrier_cost']
+    margin_improvement = sco_metrics['margin'] - non_sco_metrics['margin']
+    revenue_improvement = sco_metrics['revenue'] - non_sco_metrics['revenue']
+    
+    return {
+        'sco_metrics': sco_metrics,
+        'non_sco_metrics': non_sco_metrics,
+        'comparison': {
+            'cost_improvement': cost_improvement,
+            'margin_improvement': margin_improvement,
+            'revenue_improvement': revenue_improvement,
+            'cost_reduction_percent': (cost_improvement / non_sco_metrics['carrier_cost']) * 100 if non_sco_metrics['carrier_cost'] > 0 else 0,
+            'margin_improvement_percent': margin_improvement * 100,
+            'sco_roi': sco_metrics['sco_savings']['roi']
+        }
+    }
