@@ -745,6 +745,13 @@ def main():
     # Get current scenario AFTER all scenario loading logic has completed
     current = st.session_state.current_scenario
     
+    # Debug: Show what scenario is actually loaded
+    st.sidebar.write(f"🔍 Loaded Scenario: {current.get('name', 'Unknown')}")
+    st.sidebar.write(f"  - carrier_rate: {current.get('carrier_rate', 'N/A')}")
+    st.sidebar.write(f"  - customer_price: {current.get('customer_price', 'N/A')}")
+    st.sidebar.write(f"  - budget: {current.get('budget', 'N/A')}")
+    st.sidebar.write(f"  - monthly_usage_per_line: {current.get('monthly_usage_per_line', 'N/A')}")
+    
     # Input controls
     students = st.sidebar.slider(
         "Number of Lines",
@@ -999,15 +1006,6 @@ def main():
             # Force rerun to show notification
             # Trigger rerun to update the UI
             st.experimental_rerun()
-    
-    # Debug: Show calculation parameters
-    st.sidebar.write(f"🔍 Calculation Parameters:")
-    st.sidebar.write(f"  - students: {students}")
-    st.sidebar.write(f"  - monthly_usage_per_line: {monthly_usage_per_line}")
-    st.sidebar.write(f"  - carrier_rate: {carrier_rate}")
-    st.sidebar.write(f"  - customer_price: {customer_price}")
-    st.sidebar.write(f"  - budget: {budget}")
-    st.sidebar.write(f"  - sco_enabled: {sco_enabled}")
     
     # Calculate metrics (use SCO if enabled)
     if sco_enabled:
