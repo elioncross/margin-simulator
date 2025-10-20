@@ -569,6 +569,9 @@ def main():
             # Update SCO toggle to match scenario setting
             if 'sco_enabled' in scenarios['profitable']:
                 st.session_state.sco_enabled = scenarios['profitable']['sco_enabled']
+            # Update policy to match scenario setting
+            if 'policy' in scenarios['profitable']:
+                st.session_state.policy = scenarios['profitable']['policy']
             # Trigger rerun to update the UI
             st.experimental_rerun()
     
@@ -578,6 +581,9 @@ def main():
             # Update SCO toggle to match scenario setting
             if 'sco_enabled' in scenarios['unprofitable']:
                 st.session_state.sco_enabled = scenarios['unprofitable']['sco_enabled']
+            # Update policy to match scenario setting
+            if 'policy' in scenarios['unprofitable']:
+                st.session_state.policy = scenarios['unprofitable']['policy']
             # Trigger rerun to update the UI
             st.experimental_rerun()
     
@@ -603,6 +609,10 @@ def main():
         # Update SCO toggle to match scenario setting
         if 'sco_enabled' in scenario:
             st.session_state.sco_enabled = scenario['sco_enabled']
+        
+        # Update policy to match scenario setting
+        if 'policy' in scenario:
+            st.session_state.policy = scenario['policy']
         
         # Trigger rerun to update the UI
         st.experimental_rerun()
@@ -662,12 +672,23 @@ def main():
         key="customer_price_input"
     )
     
+    # Initialize policy session state if not exists
+    if 'policy' not in st.session_state:
+        st.session_state.policy = current['policy']
+    
+    # Get current policy index
+    policy_options = ["Public Sector (Schools)", "Retail (Households)", "Enterprise"]
+    current_policy_index = policy_options.index(st.session_state.policy) if st.session_state.policy in policy_options else 0
+    
     policy = st.sidebar.selectbox(
         "Vertical",
-        options=["Public Sector (Schools)", "Retail (Households)", "Enterprise"],
-        index=0 if current['policy'] == "Per Student" else (1 if current['policy'] == "Per Household" else 2),
+        options=policy_options,
+        index=current_policy_index,
         key="policy_selectbox"
     )
+    
+    # Update session state when policy changes
+    st.session_state.policy = policy
     
     throttling = st.sidebar.checkbox(
         "Throttling",
