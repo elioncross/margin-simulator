@@ -726,11 +726,30 @@ def main():
     
     # Show AI status
     ai_status = get_ai_narrative_status()
-    if ai_status['ollama_available']:
+    
+    # Display status with debug info
+    if ai_status['ollama_available'] and ai_status['google_ai_available']:
+        st.sidebar.success("✅ Ollama + Google AI Available")
+    elif ai_status['ollama_available']:
         st.sidebar.success("✅ Ollama (Local AI) Available")
+    elif ai_status['google_ai_available']:
+        st.sidebar.success("✅ Google AI (Cloud) Available")
     else:
         st.sidebar.info("📝 Using Smart Templates")
         st.sidebar.caption("Start Ollama for local AI narratives")
+    
+    # Debug information (expandable)
+    with st.sidebar.expander("🔍 Debug Info", expanded=False):
+        st.write("**AI Status:**", ai_status['status'])
+        st.write("**Ollama:**", ai_status['ollama_available'])
+        st.write("**Google AI:**", ai_status['google_ai_available'])
+        
+        if 'debug_info' in ai_status:
+            debug = ai_status['debug_info']
+            st.write("**API Key Present:**", debug['api_key_present'])
+            st.write("**API Key Length:**", debug['api_key_length'])
+            st.write("**API Key Prefix:**", debug['api_key_prefix'])
+            st.write("**AI-related Env Vars:**", debug['all_env_vars'])
     
     # Optimization section
     st.sidebar.markdown("---")

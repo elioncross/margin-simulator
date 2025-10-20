@@ -611,7 +611,16 @@ def get_ai_narrative_status() -> Dict[str, Any]:
         pass
     
     # Check if Google AI API key is available
-    google_ai_available = bool(os.getenv('GOOGLE_AI_API_KEY'))
+    api_key = os.getenv('GOOGLE_AI_API_KEY')
+    google_ai_available = bool(api_key)
+    
+    # Debug information for troubleshooting
+    debug_info = {
+        'api_key_present': bool(api_key),
+        'api_key_length': len(api_key) if api_key else 0,
+        'api_key_prefix': api_key[:10] + "..." if api_key and len(api_key) > 10 else "N/A",
+        'all_env_vars': [k for k in os.environ.keys() if 'GOOGLE' in k or 'AI' in k]
+    }
     
     # Determine status message
     if ollama_available and google_ai_available:
@@ -627,5 +636,6 @@ def get_ai_narrative_status() -> Dict[str, Any]:
         'ollama_available': ollama_available,
         'google_ai_available': google_ai_available,
         'fallback_available': True,
-        'status': status
+        'status': status,
+        'debug_info': debug_info
     }
