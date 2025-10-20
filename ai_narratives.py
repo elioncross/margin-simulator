@@ -93,6 +93,10 @@ def generate_ai_narrative(metrics: Dict[str, Any], context: Dict[str, Any], view
     
     print(f"🚨 DEBUG: generate_ai_narrative called for {view_type} view")
     
+    # Also write to file for debugging
+    with open("debug_ai.txt", "a") as f:
+        f.write(f"🚨 DEBUG: generate_ai_narrative called for {view_type} view\n")
+    
     # Try Ollama first (local AI)
     print(f"🔍 DEBUG: Trying Ollama for {view_type} narrative")
     ai_narrative = _generate_ollama_narrative(metrics, context, view_type)
@@ -288,10 +292,18 @@ IMPORTANT: Write as a single paragraph without line breaks or bullet points."""
                     # Debug: Show raw narrative
                     print(f"🔍 DEBUG: Google AI raw narrative: '{raw_narrative[:100]}...'")
                     
+                    # Also write to file for debugging
+                    with open("debug_ai.txt", "a") as f:
+                        f.write(f"🔍 DEBUG: Google AI raw narrative: '{raw_narrative[:200]}...'\n")
+                    
                     # Clean up the narrative formatting
                     narrative = _clean_narrative(raw_narrative)
                     
                     print(f"🔍 DEBUG: Google AI cleaned narrative: '{narrative[:100]}...'")
+                    
+                    # Also write cleaned narrative to file
+                    with open("debug_ai.txt", "a") as f:
+                        f.write(f"🔍 DEBUG: Google AI cleaned narrative: '{narrative[:200]}...'\n")
                     print(f"🔍 DEBUG: Google AI success - generated {len(narrative)} character narrative")
                     return narrative
             
