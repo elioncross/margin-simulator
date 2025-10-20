@@ -1098,13 +1098,21 @@ def main():
                         st.write(ai_narrative)
                     else:
                         st.error(ai_label + ":")
-                        # Debug: Show exact text being displayed
-                        st.write("**Raw text (repr):**")
-                        st.code(repr(ai_narrative))
-                        st.write("**Raw text (as-is):**")
-                        st.code(ai_narrative)
-                        st.write("**Method 1 - st.write:**")
-                        st.write(ai_narrative)
+                        # Try using HTML to avoid browser rendering issues
+                        st.markdown(f"""
+                        <div style="
+                            background-color: #ffebee;
+                            border: 1px solid #f44336;
+                            border-radius: 0.5rem;
+                            padding: 1rem;
+                            margin: 0.5rem 0;
+                            font-family: 'Source Sans Pro', sans-serif;
+                            font-size: 14px;
+                            line-height: 1.5;
+                        ">
+                            {ai_narrative}
+                        </div>
+                        """, unsafe_allow_html=True)
             else:
                 # Fallback to static narrative
                 if metrics['margin'] > 0:
