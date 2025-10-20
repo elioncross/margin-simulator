@@ -35,35 +35,35 @@ SCENARIOS = {
     'unprofitable': UNPROFITABLE_SCENARIO,
     'high_volume': {
         'name': 'High Volume Scenario',
-        'description': 'Large student base with moderate settings',
-        'students': 800,
-        'cap': 3.0,
-        'budget': 15000.0,
-        'carrier_rate': 7.0,
-        'customer_price': 20.0,  # $20/month per line
+        'description': 'Large student base with volume discounts',
+        'students': 1000,
+        'cap': 4.0,
+        'budget': 20000.0,
+        'carrier_rate': 6.0,  # Volume discount
+        'customer_price': 18.0,  # $18/month per line
         'policy': 'Retail (Households)',
         'throttling': True
     },
     'premium': {
         'name': 'Premium Service Scenario',
         'description': 'High-end service with premium pricing',
-        'students': 300,
-        'cap': 8.0,
-        'budget': 18000.0,
-        'carrier_rate': 9.0,
-        'customer_price': 35.0,  # $35/month per line
-        'policy': 'Public Sector (Schools)',
+        'students': 200,
+        'cap': 10.0,
+        'budget': 12000.0,
+        'carrier_rate': 8.0,
+        'customer_price': 45.0,  # $45/month per line
+        'policy': 'Enterprise',
         'throttling': False
     },
     'budget': {
         'name': 'Budget Scenario',
         'description': 'Cost-conscious approach with limited budget',
-        'students': 600,
-        'cap': 2.0,
-        'budget': 8000.0,
-        'carrier_rate': 6.0,
-        'customer_price': 15.0,  # $15/month per line
-        'policy': 'Retail (Households)',
+        'students': 400,
+        'cap': 2.5,
+        'budget': 6000.0,
+        'carrier_rate': 6.5,
+        'customer_price': 12.0,  # $12/month per line
+        'policy': 'Public Sector (Schools)',
         'throttling': True
     },
     'sco_enterprise': {
@@ -74,7 +74,7 @@ SCENARIOS = {
         'base_plan_gb': 3.0,  # Internal base plan
         'budget': 15000.0,
         'carrier_rate': 8.0,
-        'customer_price': 12.0,
+        'customer_price': 25.0,  # Realistic enterprise pricing
         'policy': 'Enterprise',
         'throttling': True,
         'sco_enabled': True,
@@ -106,7 +106,7 @@ SCENARIOS = {
         'base_plan_gb': 5.0,  # Same as customer cap
         'budget': 12000.0,
         'carrier_rate': 8.0,
-        'customer_price': 12.0,
+        'customer_price': 20.0,  # More realistic pricing
         'policy': 'Public Sector (Schools)',
         'throttling': False,
         'sco_enabled': False,
