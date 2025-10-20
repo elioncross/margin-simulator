@@ -1284,7 +1284,7 @@ def main():
                     f"Revenue / (Lines × Monthly Price per Line) × 100\n= ${metrics['revenue']:,.2f} / ({students} × ${customer_price:.2f}) × 100",
                     f"Revenue / Budget × 100\n= ${metrics['revenue']:,.2f} / ${budget:,.2f} × 100",
                     f"Budget - Revenue\n= ${budget:,.2f} - ${metrics['revenue']:,.2f}",
-                    f"SCO Efficiency Setting\n= {metrics.get('sco_efficiency', 0.85):.1%}",
+                    f"SCO Efficiency Setting\n= {sco_efficiency:.1%}",
                     f"SCO Savings / SCO Costs\n= ${metrics.get('sco_savings', {}).get('total_savings', 0):,.2f} / ${metrics.get('sco_savings', {}).get('total_costs', 1):,.2f}"
                 ]
             }
