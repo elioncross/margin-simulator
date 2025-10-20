@@ -1214,10 +1214,10 @@ except AttributeError:
                     current_scenario['cap'] = result['recommended_cap']
                     st.session_state.current_scenario = current_scenario
                     # Use version-compatible rerun method
-try:
-    st.rerun()
-except AttributeError:
-    st.experimental_rerun()
+                    try:
+                        st.rerun()
+                    except AttributeError:
+                        st.experimental_rerun()
             else:
                 st.error("❌ " + result['message'])
                 st.info("💡 Try relaxing your minimum coverage or margin requirements")
