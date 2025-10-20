@@ -664,6 +664,12 @@ def main():
             if 'forecast_results' in st.session_state:
                 del st.session_state.forecast_results
             
+            # Debug: Show what we're loading for unprofitable scenario
+            st.sidebar.write(f"🔍 Loading unprofitable scenario:")
+            st.sidebar.write(f"  - sco_enabled: {st.session_state.sco_enabled}")
+            st.sidebar.write(f"  - monthly_usage_per_line: {st.session_state.monthly_usage_per_line}")
+            st.sidebar.write(f"  - base_plan_gb: {st.session_state.base_plan_gb}")
+            
             # Trigger rerun to update the UI
             st.experimental_rerun()
     
