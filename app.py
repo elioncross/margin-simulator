@@ -356,11 +356,21 @@ def display_help_guide():
         - **Financial View**: Financial performance insights
         - **Optimization**: AI explanation of recommended changes
         
+        ### AI Options (Priority Order):
+        1. **Ollama (Local)**: Free, private, runs on your machine
+        2. **Google AI (Cloud)**: Enhanced cloud-based AI via Gemini API
+        3. **Smart Templates**: Fallback when AI unavailable
+        
         ### Ollama Setup (Optional):
         1. Install Ollama: https://ollama.ai/
         2. Pull model: `ollama pull llama3.2`
         3. Start server: `ollama serve`
         4. Enable AI Narratives in sidebar
+        
+        ### Google AI Setup (Cloud Only):
+        - Set `GOOGLE_AI_API_KEY` in Streamlit secrets
+        - Automatically used when Ollama unavailable
+        - Enhanced cloud-based AI narratives
         
         ### Fallback Templates:
         - Smart templates when AI unavailable
@@ -487,10 +497,11 @@ def display_help_guide():
         ## 🔧 Troubleshooting
         
         ### Common Issues:
-        - **No AI Narratives**: Check if Ollama is running (`ollama serve`)
+        - **No AI Narratives**: Check if Ollama is running (`ollama serve`) or Google AI API key is set
         - **Slow Performance**: Try smaller models or disable AI features
         - **Missing Data**: Use Historical Analysis tab to generate synthetic data
         - **Optimization Fails**: Relax constraints (lower minimum coverage/margin)
+        - **Google AI Not Working**: Verify API key in Streamlit secrets
         
         ### Getting Help:
         - Check the sidebar status indicators
@@ -732,7 +743,7 @@ def main():
         st.sidebar.success("✅ Google AI (Cloud) Available")
     else:
         st.sidebar.info("📝 Using Smart Templates")
-        st.sidebar.caption("Start Ollama for local AI narratives")
+        st.sidebar.caption("No AI services available - using fallback templates")
     
     # AI Status (simplified)
     with st.sidebar.expander("🤖 AI Status", expanded=False):
@@ -1409,11 +1420,15 @@ def main():
         
         # AI Insights status
         ai_insights_status = get_ai_insights_status()
-        if ai_insights_status['ollama_available']:
+        if ai_insights_status['ollama_available'] and ai_insights_status['google_ai_available']:
+            st.success("✅ Ollama + Google AI Available for Advanced Insights")
+        elif ai_insights_status['ollama_available']:
             st.success("✅ Ollama (Local AI) Available for Advanced Insights")
+        elif ai_insights_status['google_ai_available']:
+            st.success("✅ Google AI (Cloud) Available for Advanced Insights")
         else:
-            st.info("📝 Using Intelligent Templates - Start Ollama for AI-powered insights")
-            st.caption("Run: `ollama serve` to enable advanced AI forecasting")
+            st.info("📝 Using Intelligent Templates - No AI services available")
+            st.caption("AI insights require Ollama (local) or Google AI (cloud) to be configured")
         
         # Load historical data for analysis
         synthetic_data = load_synthetic_data()
