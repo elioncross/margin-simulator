@@ -86,6 +86,8 @@ def generate_ai_narrative(metrics: Dict[str, Any], context: Dict[str, Any], view
         Generated narrative string
     """
     
+    print(f"🚨 DEBUG: generate_ai_narrative called for {view_type} view")
+    
     # Try Ollama first (local AI)
     print(f"🔍 DEBUG: Trying Ollama for {view_type} narrative")
     ai_narrative = _generate_ollama_narrative(metrics, context, view_type)
@@ -101,6 +103,7 @@ def generate_ai_narrative(metrics: Dict[str, Any], context: Dict[str, Any], view
         return ai_narrative
     
     # Fallback to intelligent templates
+    print(f"🔍 DEBUG: Using template fallback for {view_type} narrative")
     return _generate_template_narrative(metrics, context, view_type)
 
 def _generate_ollama_narrative(metrics: Dict[str, Any], context: Dict[str, Any], view_type: str) -> Optional[str]:
