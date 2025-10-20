@@ -664,12 +664,6 @@ def main():
             if 'forecast_results' in st.session_state:
                 del st.session_state.forecast_results
             
-            # Debug: Show what we're loading for unprofitable scenario
-            st.sidebar.write(f"🔍 Loading unprofitable scenario:")
-            st.sidebar.write(f"  - sco_enabled: {st.session_state.sco_enabled}")
-            st.sidebar.write(f"  - monthly_usage_per_line: {st.session_state.monthly_usage_per_line}")
-            st.sidebar.write(f"  - base_plan_gb: {st.session_state.base_plan_gb}")
-            
             # Trigger rerun to update the UI
             st.experimental_rerun()
     
@@ -839,17 +833,12 @@ def main():
     st.session_state.sco_enabled = sco_enabled
     
     if sco_enabled:
-        # Initialize SCO parameters in session state
-        if 'base_plan_gb' not in st.session_state:
-            st.session_state.base_plan_gb = current.get('base_plan_gb', 3.0)
-        if 'sco_efficiency' not in st.session_state:
-            st.session_state.sco_efficiency = current.get('sco_efficiency', 0.85)
-        if 'overage_rate' not in st.session_state:
-            st.session_state.overage_rate = current.get('overage_rate', 15.0)
-        if 'plan_switching_cost' not in st.session_state:
-            st.session_state.plan_switching_cost = current.get('plan_switching_cost', 0.5)
-        if 'monthly_usage_per_line' not in st.session_state:
-            st.session_state.monthly_usage_per_line = current.get('monthly_usage_per_line', 2.5)
+        # Initialize SCO parameters in session state (force update from current scenario)
+        st.session_state.base_plan_gb = current.get('base_plan_gb', 3.0)
+        st.session_state.sco_efficiency = current.get('sco_efficiency', 0.85)
+        st.session_state.overage_rate = current.get('overage_rate', 15.0)
+        st.session_state.plan_switching_cost = current.get('plan_switching_cost', 0.5)
+        st.session_state.monthly_usage_per_line = current.get('monthly_usage_per_line', 2.5)
         
         # SCO-specific parameters
         base_plan_gb = st.sidebar.slider(
@@ -909,12 +898,12 @@ def main():
         st.session_state.plan_switching_cost = plan_switching_cost
         st.session_state.monthly_usage_per_line = monthly_usage_per_line
     else:
-        # Default values when SCO is disabled
-        base_plan_gb = cap  # Same as customer cap
+        # Default values when SCO is disabled (force update from current scenario)
+        base_plan_gb = current.get('base_plan_gb', cap)  # Use scenario value or default to cap
         sco_efficiency = 0.0
-        overage_rate = 15.0
+        overage_rate = current.get('overage_rate', 15.0)  # Use scenario value
         plan_switching_cost = 0.0
-        monthly_usage_per_line = 2.5  # Default realistic usage
+        monthly_usage_per_line = current.get('monthly_usage_per_line', 2.5)  # Use scenario value
     
     # AI Narratives section
     st.sidebar.markdown("---")
