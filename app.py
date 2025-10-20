@@ -776,7 +776,19 @@ def main():
                 except:
                     st.write("**Method 2 (get):** Failed")
             
-            # Method 3: Check if secrets object exists
+            # Method 3: Nested access (current format)
+            if not secret_value or secret_value == "NOT_FOUND":
+                try:
+                    nested_value = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY", "NOT_FOUND")
+                    if nested_value != "NOT_FOUND":
+                        secret_value = nested_value
+                        st.write("**Method 3 (nested):** Success")
+                    else:
+                        st.write("**Method 3 (nested):** NOT_FOUND")
+                except:
+                    st.write("**Method 3 (nested):** Failed")
+            
+            # Method 4: Check if secrets object exists
             try:
                 st.write("**Secrets object exists:**", hasattr(st, 'secrets'))
                 if hasattr(st, 'secrets'):

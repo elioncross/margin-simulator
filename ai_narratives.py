@@ -203,8 +203,13 @@ def _generate_google_ai_narrative(metrics: Dict[str, Any], context: Dict[str, An
     if not api_key:
         try:
             import streamlit as st
+            # Try direct access first
             api_key = st.secrets.get("GOOGLE_AI_API_KEY")
-            print(f"🔍 DEBUG: Using Streamlit secrets for Google AI API key")
+            if not api_key:
+                # Try nested access (current format)
+                api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
+            if api_key:
+                print(f"🔍 DEBUG: Using Streamlit secrets for Google AI API key")
         except:
             pass
     
@@ -484,8 +489,13 @@ def _generate_google_ai_optimization_narrative(optimization_result: Dict[str, An
     if not api_key:
         try:
             import streamlit as st
+            # Try direct access first
             api_key = st.secrets.get("GOOGLE_AI_API_KEY")
-            print(f"🔍 DEBUG: Using Streamlit secrets for Google AI API key (optimization)")
+            if not api_key:
+                # Try nested access (current format)
+                api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
+            if api_key:
+                print(f"🔍 DEBUG: Using Streamlit secrets for Google AI API key (optimization)")
         except:
             pass
     
@@ -643,8 +653,13 @@ def get_ai_narrative_status() -> Dict[str, Any]:
     if not api_key:
         try:
             import streamlit as st
+            # Try direct access first
             api_key = st.secrets.get("GOOGLE_AI_API_KEY")
-            print(f"🔍 DEBUG: Using Streamlit secrets for Google AI API key (status check)")
+            if not api_key:
+                # Try nested access (current format)
+                api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
+            if api_key:
+                print(f"🔍 DEBUG: Using Streamlit secrets for Google AI API key (status check)")
         except:
             pass
     
