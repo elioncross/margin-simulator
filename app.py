@@ -961,11 +961,14 @@ def main():
                     
                     # Show which AI mode is being used
                     if ai_status['ollama_available']:
-                        st.info(f"🤖 **AI-Generated** (Ollama): {ai_narrative}")
+                        st.info("🤖 **AI-Generated** (Ollama):")
+                        st.write(ai_narrative)
                     elif ai_status['google_ai_available']:
-                        st.info(f"🤖 **AI-Generated** (Google AI): {ai_narrative}")
+                        st.info("🤖 **AI-Generated** (Google AI):")
+                        st.write(ai_narrative)
                     else:
-                        st.info(f"📝 **Smart Template**: {ai_narrative}")
+                        st.info("📝 **Smart Template**:")
+                        st.write(ai_narrative)
             else:
                 # Enhanced fallback narrative
                 connected_lines = int(students * metrics['coverage'] / 100)
@@ -1213,9 +1216,11 @@ def main():
                             ai_label = "📝 **Smart Template**"
                         
                         if result['feasible']:
-                            st.success(f"{ai_label}: {opt_narrative}")
+                            st.success(ai_label + ":")
+                            st.write(opt_narrative)
                         else:
-                            st.error(f"{ai_label}: {opt_narrative}")
+                            st.error(ai_label + ":")
+                            st.write(opt_narrative)
                 else:
                     # Fallback to static message
                     st.info("🎯 **Optimization Complete:** Found optimal pricing and data cap configuration for maximum profitability.")
