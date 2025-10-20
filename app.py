@@ -1089,12 +1089,16 @@ def main():
                     # Debug: Show raw narrative before display
                     st.write("🔍 DEBUG - Raw AI narrative:", repr(ai_narrative))
                     
+                    # Try displaying text separately to avoid browser rendering issues
                     if metrics['margin'] > 0:
-                        st.success(f"{ai_label}: {ai_narrative}")
+                        st.success(ai_label + ":")
+                        st.write(ai_narrative)
                     elif metrics['margin'] == 0:
-                        st.warning(f"{ai_label}: {ai_narrative}")
+                        st.warning(ai_label + ":")
+                        st.write(ai_narrative)
                     else:
-                        st.error(f"{ai_label}: {ai_narrative}")
+                        st.error(ai_label + ":")
+                        st.write(ai_narrative)
             else:
                 # Fallback to static narrative
                 if metrics['margin'] > 0:
