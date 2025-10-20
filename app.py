@@ -755,9 +755,43 @@ def main():
         st.write("---")
         st.write("**Secret Test:**")
         try:
-            secret_value = st.secrets.get("GOOGLE_AI_API_KEY", "NOT_FOUND")
-            st.write("**Secret Value:**", secret_value[:10] + "..." if len(secret_value) > 10 else secret_value)
-            st.write("**Secret Present:**", secret_value != "NOT_FOUND")
+            # Try multiple methods to get the secret
+            secret_value = None
+            
+            # Method 1: Direct access
+            try:
+                secret_value = st.secrets["GOOGLE_AI_API_KEY"]
+                st.write("**Method 1 (direct):** Success")
+            except:
+                st.write("**Method 1 (direct):** Failed")
+            
+            # Method 2: get() method
+            if not secret_value:
+                try:
+                    secret_value = st.secrets.get("GOOGLE_AI_API_KEY", "NOT_FOUND")
+                    if secret_value != "NOT_FOUND":
+                        st.write("**Method 2 (get):** Success")
+                    else:
+                        st.write("**Method 2 (get):** NOT_FOUND")
+                except:
+                    st.write("**Method 2 (get):** Failed")
+            
+            # Method 3: Check if secrets object exists
+            try:
+                st.write("**Secrets object exists:**", hasattr(st, 'secrets'))
+                if hasattr(st, 'secrets'):
+                    st.write("**Secrets keys:**", list(st.secrets.keys()) if hasattr(st.secrets, 'keys') else "No keys method")
+            except:
+                st.write("**Secrets object check:** Failed")
+            
+            # Display result
+            if secret_value and secret_value != "NOT_FOUND":
+                st.write("**Secret Value:**", secret_value[:10] + "..." if len(secret_value) > 10 else secret_value)
+                st.write("**Secret Present:**", True)
+            else:
+                st.write("**Secret Value:**", "NOT_FOUND")
+                st.write("**Secret Present:**", False)
+                
         except Exception as e:
             st.write("**Secret Error:**", str(e))
     
