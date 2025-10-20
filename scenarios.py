@@ -13,7 +13,8 @@ PROFITABLE_SCENARIO = {
     'carrier_rate': 8.0,  # $8/GB
     'customer_price': 25.0,  # $25/month per line
     'policy': 'Retail (Households)',
-    'throttling': True
+    'throttling': True,
+    'monthly_usage_per_line': 2.0  # Lower usage for better profitability
 }
 
 # Unprofitable Scenario
@@ -26,7 +27,8 @@ UNPROFITABLE_SCENARIO = {
     'carrier_rate': 12.0,  # High carrier cost
     'customer_price': 15.0,  # Low customer price
     'policy': 'Public Sector (Schools)',
-    'throttling': False
+    'throttling': False,
+    'monthly_usage_per_line': 3.5  # Higher usage to ensure unprofitability
 }
 
 # Additional test scenarios
