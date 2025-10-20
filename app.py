@@ -617,6 +617,7 @@ def main():
     
     with col2:
         if st.button("❌ Unprofitable Example", help="Load unprofitable scenario", key="sidebar_unprofitable_example"):
+            st.sidebar.write("🔍 Button clicked! Loading unprofitable scenario...")
             st.session_state.current_scenario = scenarios['unprofitable']
             # Update SCO toggle to match scenario setting
             if 'sco_enabled' in scenarios['unprofitable']:
