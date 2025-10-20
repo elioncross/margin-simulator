@@ -206,16 +206,19 @@ def _generate_google_ai_narrative(metrics: Dict[str, Any], context: Dict[str, An
             # Check if we're in a cloud environment to avoid local secrets warnings
             is_cloud_env = (
                 'STREAMLIT_CLOUD' in os.environ or 
-                'STREAMLIT_SHARING' in os.environ or
-                hasattr(st, 'secrets') and hasattr(st.secrets, 'get')
+                'STREAMLIT_SHARING' in os.environ
             )
             
             if is_cloud_env:
-                # Try direct access first
-                api_key = st.secrets.get("GOOGLE_AI_API_KEY")
-                if not api_key:
-                    # Try nested access (current format)
-                    api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
+                try:
+                    # Try direct access first
+                    api_key = st.secrets.get("GOOGLE_AI_API_KEY")
+                    if not api_key:
+                        # Try nested access (current format)
+                        api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
+                except:
+                    # If secrets access fails, just continue without API key
+                    pass
         except:
             pass
     
@@ -494,16 +497,19 @@ def _generate_google_ai_optimization_narrative(optimization_result: Dict[str, An
             # Check if we're in a cloud environment to avoid local secrets warnings
             is_cloud_env = (
                 'STREAMLIT_CLOUD' in os.environ or 
-                'STREAMLIT_SHARING' in os.environ or
-                hasattr(st, 'secrets') and hasattr(st.secrets, 'get')
+                'STREAMLIT_SHARING' in os.environ
             )
             
             if is_cloud_env:
-                # Try direct access first
-                api_key = st.secrets.get("GOOGLE_AI_API_KEY")
-                if not api_key:
-                    # Try nested access (current format)
-                    api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
+                try:
+                    # Try direct access first
+                    api_key = st.secrets.get("GOOGLE_AI_API_KEY")
+                    if not api_key:
+                        # Try nested access (current format)
+                        api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
+                except:
+                    # If secrets access fails, just continue without API key
+                    pass
         except:
             pass
     
@@ -660,16 +666,19 @@ def get_ai_narrative_status() -> Dict[str, Any]:
             # Check if we're in a cloud environment to avoid local secrets warnings
             is_cloud_env = (
                 'STREAMLIT_CLOUD' in os.environ or 
-                'STREAMLIT_SHARING' in os.environ or
-                hasattr(st, 'secrets') and hasattr(st.secrets, 'get')
+                'STREAMLIT_SHARING' in os.environ
             )
             
             if is_cloud_env:
-                # Try direct access first
-                api_key = st.secrets.get("GOOGLE_AI_API_KEY")
-                if not api_key:
-                    # Try nested access (current format)
-                    api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
+                try:
+                    # Try direct access first
+                    api_key = st.secrets.get("GOOGLE_AI_API_KEY")
+                    if not api_key:
+                        # Try nested access (current format)
+                        api_key = st.secrets.get("secrets", {}).get("GOOGLE_AI_API_KEY")
+                except:
+                    # If secrets access fails, just continue without API key
+                    pass
         except:
             pass
     
