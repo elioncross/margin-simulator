@@ -1265,7 +1265,7 @@ def main():
                     f"{metrics['coverage']:.1f}%",
                     f"{metrics.get('budget_utilization', 0):.1f}%",
                     f"${metrics.get('budget_remaining', 0):,.2f}",
-                    f"{metrics.get('sco_efficiency', 0):.1f}%",
+                    f"{st.session_state.sco_efficiency:.1%}",
                     f"{metrics.get('sco_savings', {}).get('roi', 0):.1f}x"
                 ],
                 'Formula': [
@@ -1836,7 +1836,7 @@ def main():
                     f"${customer_price:.2f}",
                     f"{metrics.get('policy_factor', 1.0):.1f}",
                     f"{metrics.get('efficiency_factor', 1.0):.1f}",
-                    f"{metrics.get('sco_efficiency', 0.85):.1f}%",
+                    f"{st.session_state.sco_efficiency:.1%}",
                     f"{metrics['usage']:,.1f}",
                     f"{metrics.get('base_usage', 0):,.1f}",
                     f"{metrics.get('potential_overage', 0):,.1f}",
