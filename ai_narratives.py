@@ -1,6 +1,6 @@
 """
 AI Narratives Module for Margin Impact Simulator
-Provides AI-powered contextual narratives using Perplexity API with intelligent fallbacks.
+Provides AI-powered contextual narratives using Ollama (local), Google AI (cloud), or intelligent fallbacks.
 """
 
 import requests
@@ -67,7 +67,7 @@ def _clean_narrative(text: str) -> str:
 
 def generate_ai_narrative(metrics: Dict[str, Any], context: Dict[str, Any], view_type: str = "financial") -> str:
     """
-    Generate AI-powered narrative using Perplexity API with intelligent fallback.
+    Generate AI-powered narrative using Ollama (local), Google AI (cloud), or intelligent fallback.
     
     Args:
         metrics: Current calculated metrics (usage, cost, revenue, margin, coverage)
@@ -78,8 +78,13 @@ def generate_ai_narrative(metrics: Dict[str, Any], context: Dict[str, Any], view
         Generated narrative string
     """
     
-    # Try AI generation first
+    # Try Ollama first (local AI)
     ai_narrative = _generate_ollama_narrative(metrics, context, view_type)
+    if ai_narrative:
+        return ai_narrative
+    
+    # Try Google AI (cloud AI)
+    ai_narrative = _generate_google_ai_narrative(metrics, context, view_type)
     if ai_narrative:
         return ai_narrative
     
@@ -180,6 +185,95 @@ IMPORTANT: Write as a single paragraph without line breaks or bullet points."""
         print(f"🔍 DEBUG: Ollama API error: {e}")
         return None
 
+def _generate_google_ai_narrative(metrics: Dict[str, Any], context: Dict[str, Any], view_type: str) -> Optional[str]:
+    """
+    Generate narrative using Google AI (Gemini API).
+    
+    Note: This requires a Google AI API key to be set in the environment variable GOOGLE_AI_API_KEY.
+    """
+    
+    # Check if Google AI API key is available
+    api_key = os.getenv('GOOGLE_AI_API_KEY')
+    if not api_key:
+        print("🔍 DEBUG: Google AI API key not found - using fallback templates")
+        return None
+    
+    print(f"🔍 DEBUG: Using Google AI for {view_type} narrative")
+    
+    # Prepare the prompt based on view type
+    if view_type == "customer":
+        prompt = f"""As a business technology consultant, provide an encouraging, customer-focused narrative about this connectivity scenario:
+
+- {context['students']} lines with {context['cap']}GB data cap each
+- {metrics['coverage']:.1f}% coverage achieved
+- Vertical: {context['policy']}
+- Throttling: {'Enabled' if context['throttling'] else 'Disabled'}
+
+Focus on service coverage, customer satisfaction, and business outcomes. Use business terminology - refer to 'lines', 'customers', 'service coverage', NOT 'students' or 'educational'. Be encouraging and solution-oriented.
+Keep it under 100 words and use emojis appropriately. Write in a professional, accessible tone.
+IMPORTANT: Write as a single paragraph without line breaks or bullet points."""
+    else:  # financial
+        prompt = f"""As a business analyst, provide a concise analysis of this connectivity service performance:
+
+- Revenue: ${metrics['revenue']:,.0f} (Budget: ${context['budget']:,.0f})
+- Margin: {metrics['margin']:.1%}
+- Coverage: {metrics['coverage']:.1f}%
+- Vertical: {context['policy']}
+- Throttling: {'On' if context['throttling'] else 'Off'}
+- Usage: {metrics['usage']:,.1f} GB
+
+Highlight key business insights, risks, and opportunities. Use business terminology - refer to 'lines', 'customers', 'service coverage', NOT 'students' or 'educational'. Be analytical but accessible.
+Keep it under 120 words. Focus on operational performance and actionable business insights.
+IMPORTANT: Write as a single paragraph without line breaks or bullet points."""
+    
+    try:
+        # Use Google AI Gemini API
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={api_key}"
+        
+        headers = {
+            'Content-Type': 'application/json',
+        }
+        
+        data = {
+            "contents": [{
+                "parts": [{
+                    "text": f"You are an expert analyst providing clear, actionable insights. Be concise and professional. Write in a single paragraph without line breaks or bullet points.\n\n{prompt}"
+                }]
+            }],
+            "generationConfig": {
+                "temperature": 0.7,
+                "maxOutputTokens": 200,
+                "stopSequences": ["\n\n", "**", "##", "###"]
+            }
+        }
+        
+        response = requests.post(url, headers=headers, json=data, timeout=30)
+        
+        if response.status_code == 200:
+            result = response.json()
+            
+            # Extract the generated text from Google AI response
+            if 'candidates' in result and len(result['candidates']) > 0:
+                candidate = result['candidates'][0]
+                if 'content' in candidate and 'parts' in candidate['content']:
+                    narrative = candidate['content']['parts'][0]['text'].strip()
+                    
+                    # Clean up the narrative formatting
+                    narrative = _clean_narrative(narrative)
+                    
+                    print(f"🔍 DEBUG: Google AI success - generated {len(narrative)} character narrative")
+                    return narrative
+            
+            print("🔍 DEBUG: Google AI response format unexpected")
+            return None
+        else:
+            print(f"🔍 DEBUG: Google AI API error: {response.status_code} - {response.text}")
+            return None
+            
+    except Exception as e:
+        print(f"🔍 DEBUG: Google AI API error: {e}")
+        return None
+
 def _generate_template_narrative(metrics: Dict[str, Any], context: Dict[str, Any], view_type: str) -> str:
     """
     Generate intelligent template-based narrative as fallback.
@@ -249,11 +343,16 @@ def _generate_financial_narrative(metrics: Dict[str, Any], context: Dict[str, An
 def generate_optimization_narrative(optimization_result: Dict[str, Any], current_metrics: Dict[str, Any]) -> str:
     """
     Generate AI narrative for pricing and data cap optimization results.
-    Tries Ollama first, then falls back to intelligent templates.
+    Tries Ollama first, then Google AI, then falls back to intelligent templates.
     """
 
-    # Try AI generation first
+    # Try Ollama first (local AI)
     ai_narrative = _generate_ollama_optimization_narrative(optimization_result, current_metrics)
+    if ai_narrative:
+        return ai_narrative
+
+    # Try Google AI (cloud AI)
+    ai_narrative = _generate_google_ai_optimization_narrative(optimization_result, current_metrics)
     if ai_narrative:
         return ai_narrative
 
@@ -358,6 +457,99 @@ IMPORTANT: Write as a single paragraph without line breaks or bullet points."""
         print(f"🔍 DEBUG: Ollama API error for optimization: {e}")
         return None
 
+def _generate_google_ai_optimization_narrative(optimization_result: Dict[str, Any], current_metrics: Dict[str, Any]) -> Optional[str]:
+    """
+    Generate optimization narrative using Google AI (Gemini API).
+    """
+    
+    # Check if Google AI API key is available
+    api_key = os.getenv('GOOGLE_AI_API_KEY')
+    if not api_key:
+        print("🔍 DEBUG: Google AI API key not found for optimization - using fallback templates")
+        return None
+    
+    print("🔍 DEBUG: Using Google AI for optimization narrative")
+    
+    if not optimization_result.get('feasible', False):
+        prompt = f"""As a business analyst, provide a concise analysis of why no feasible optimization solution was found:
+
+Current constraints:
+- Budget: ${current_metrics.get('budget', 0):,.0f}
+- Current margin: {current_metrics.get('margin', 0):.1%}
+- Current coverage: {current_metrics.get('coverage', 0):.1f}%
+
+Focus on practical recommendations for adjusting constraints to find viable solutions.
+Keep it under 100 words and be solution-oriented.
+IMPORTANT: Write as a single paragraph without line breaks or bullet points."""
+    else:
+        recommended_price = optimization_result['recommended_customer_price']
+        recommended_cap = optimization_result['recommended_cap']
+        opt_metrics = optimization_result['metrics']
+        improvement = optimization_result['improvement']
+        margin_improvement = improvement['margin_improvement']
+        revenue_improvement = improvement['revenue_improvement']
+
+        prompt = f"""As a business analyst, provide a comprehensive analysis of this pricing optimization opportunity:
+
+Current vs Optimal:
+- Current: ${current_metrics.get('customer_price', 0):.2f}/month per line, {current_metrics.get('cap', 0):.1f}GB cap
+- Optimal: ${recommended_price:.2f}/month per line, {recommended_cap:.1f}GB cap
+- Margin improvement: {margin_improvement:.1%}
+- Revenue improvement: ${revenue_improvement:,.0f}
+- New coverage: {opt_metrics['coverage']:.1f}%
+
+Analyze the business implications, risks, and strategic opportunities. Be analytical but accessible.
+Keep it under 150 words. Focus on actionable insights and business impact.
+IMPORTANT: Write as a single paragraph without line breaks or bullet points."""
+
+    try:
+        # Use Google AI Gemini API
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={api_key}"
+        
+        headers = {
+            'Content-Type': 'application/json',
+        }
+        
+        data = {
+            "contents": [{
+                "parts": [{
+                    "text": f"You are an expert business analyst providing clear, actionable insights. Be concise and professional. Write in a single paragraph without line breaks or bullet points.\n\n{prompt}"
+                }]
+            }],
+            "generationConfig": {
+                "temperature": 0.7,
+                "maxOutputTokens": 250,
+                "stopSequences": ["\n\n", "**", "##", "###"]
+            }
+        }
+        
+        response = requests.post(url, headers=headers, json=data, timeout=30)
+        
+        if response.status_code == 200:
+            result = response.json()
+            
+            # Extract the generated text from Google AI response
+            if 'candidates' in result and len(result['candidates']) > 0:
+                candidate = result['candidates'][0]
+                if 'content' in candidate and 'parts' in candidate['content']:
+                    narrative = candidate['content']['parts'][0]['text'].strip()
+                    
+                    # Clean up the narrative formatting
+                    narrative = _clean_narrative(narrative)
+                    
+                    print(f"🔍 DEBUG: Google AI optimization success - generated {len(narrative)} character narrative")
+                    return narrative
+            
+            print("🔍 DEBUG: Google AI optimization response format unexpected")
+            return None
+        else:
+            print(f"🔍 DEBUG: Google AI optimization API error: {response.status_code} - {response.text}")
+            return None
+            
+    except Exception as e:
+        print(f"🔍 DEBUG: Google AI optimization API error: {e}")
+        return None
+
 def _generate_template_optimization_narrative(optimization_result: Dict[str, Any], current_metrics: Dict[str, Any]) -> str:
     """
     Generate a template-based optimization narrative when AI is not available.
@@ -418,8 +610,22 @@ def get_ai_narrative_status() -> Dict[str, Any]:
     except:
         pass
     
+    # Check if Google AI API key is available
+    google_ai_available = bool(os.getenv('GOOGLE_AI_API_KEY'))
+    
+    # Determine status message
+    if ollama_available and google_ai_available:
+        status = 'Ollama (Local) + Google AI (Cloud) available'
+    elif ollama_available:
+        status = 'Ollama (Local AI) available'
+    elif google_ai_available:
+        status = 'Google AI (Cloud) available'
+    else:
+        status = 'Using intelligent templates'
+    
     return {
         'ollama_available': ollama_available,
+        'google_ai_available': google_ai_available,
         'fallback_available': True,
-        'status': 'Ollama (Local AI) available' if ollama_available else 'Using intelligent templates'
+        'status': status
     }

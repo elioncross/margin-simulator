@@ -35,7 +35,9 @@ streamlit run app.py
 ```
 
 ### Optional: AI Features
-For enhanced AI narratives and insights:
+The app supports AI-powered narratives using multiple AI providers:
+
+#### Local AI (Ollama)
 ```bash
 # Install Ollama
 curl -fsSL https://ollama.ai/install.sh | sh
@@ -47,18 +49,35 @@ ollama pull llama3.2
 ollama serve
 ```
 
+#### Cloud AI (Google AI)
+```bash
+# Get API Key from Google AI Studio
+# https://aistudio.google.com
+
+# Set environment variable
+export GOOGLE_AI_API_KEY='your_api_key_here'
+```
+
+#### AI Priority
+- **Local Development**: Ollama (if available) → Google AI (if API key set) → Templates
+- **Cloud Deployment**: Google AI (if API key set) → Templates
+
+**Note**: AI features are optional and the app works perfectly without them.
+
 ## 🌐 Deployment Options
 
 ### 1. Streamlit Community Cloud (Recommended for Hackathons)
 - **Free tier available**
 - Direct GitHub integration
 - Automatic deployments
+- **Google AI Support**: Set `GOOGLE_AI_API_KEY` in Streamlit secrets
 
 **Steps:**
 1. Push your code to GitHub
 2. Go to [share.streamlit.io](https://share.streamlit.io)
 3. Connect your GitHub repo
-4. Deploy with one click
+4. Set Google AI API key in app secrets (optional)
+5. Deploy with one click
 
 ### 2. AWS Container Deployment
 For production use:

@@ -13,6 +13,7 @@ from typing import Dict, List, Tuple, Any, Optional
 import requests
 import json
 import re
+import os
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.metrics import r2_score, mean_absolute_error
@@ -55,7 +56,7 @@ def _clean_ai_text(text: str) -> str:
 
 def generate_trend_analysis(historical_data: pd.DataFrame, current_metrics: Dict[str, Any]) -> str:
     """
-    Generate AI-powered trend analysis using Ollama.
+    Generate AI-powered trend analysis using Ollama, Google AI, or intelligent fallback.
     
     Args:
         historical_data: DataFrame with historical scenarios
@@ -64,16 +65,29 @@ def generate_trend_analysis(historical_data: pd.DataFrame, current_metrics: Dict
     Returns:
         AI-generated trend analysis narrative
     """
-    # Check if Ollama is available
+    # Try Ollama first (local AI)
     try:
         response = requests.get('http://localhost:11434/api/tags', timeout=2)
-        if response.status_code != 200:
-            return _generate_template_trend_analysis(historical_data, current_metrics)
+        if response.status_code == 200:
+            print("🔍 DEBUG: Using Ollama for trend analysis")
+            ai_narrative = _generate_ollama_trend_analysis(historical_data, current_metrics)
+            if ai_narrative:
+                return ai_narrative
     except Exception as e:
-        print(f"🔍 DEBUG: Ollama not available for trend analysis ({e}) - using fallback templates")
-        return _generate_template_trend_analysis(historical_data, current_metrics)
+        print(f"🔍 DEBUG: Ollama not available for trend analysis ({e})")
 
-    print("🔍 DEBUG: Using Ollama for trend analysis")
+    # Try Google AI (cloud AI)
+    ai_narrative = _generate_google_ai_trend_analysis(historical_data, current_metrics)
+    if ai_narrative:
+        return ai_narrative
+
+    # Fallback to intelligent templates
+    return _generate_template_trend_analysis(historical_data, current_metrics)
+
+def _generate_ollama_trend_analysis(historical_data: pd.DataFrame, current_metrics: Dict[str, Any]) -> Optional[str]:
+    """
+    Generate trend analysis using Ollama (local LLM).
+    """
 
     # Calculate trend statistics
     avg_margin = historical_data['margin'].mean()
@@ -139,11 +153,93 @@ IMPORTANT: Write as a single paragraph without line breaks or bullet points."""
                 continue
 
         print("🔍 DEBUG: No available models found in Ollama for trend analysis")
-        return _generate_template_trend_analysis(historical_data, current_metrics)
+        return None
 
     except Exception as e:
         print(f"🔍 DEBUG: Ollama API error for trend analysis: {e}")
-        return _generate_template_trend_analysis(historical_data, current_metrics)
+        return None
+
+def _generate_google_ai_trend_analysis(historical_data: pd.DataFrame, current_metrics: Dict[str, Any]) -> Optional[str]:
+    """
+    Generate trend analysis using Google AI (Gemini API).
+    """
+    
+    # Check if Google AI API key is available
+    api_key = os.getenv('GOOGLE_AI_API_KEY')
+    if not api_key:
+        print("🔍 DEBUG: Google AI API key not found for trend analysis - using fallback templates")
+        return None
+    
+    print("🔍 DEBUG: Using Google AI for trend analysis")
+    
+    # Calculate trend statistics
+    avg_margin = historical_data['margin'].mean()
+    avg_coverage = historical_data['coverage'].mean()
+    margin_trend = "increasing" if historical_data['margin'].iloc[-1] > historical_data['margin'].iloc[0] else "decreasing"
+    coverage_trend = "increasing" if historical_data['coverage'].iloc[-1] > historical_data['coverage'].iloc[0] else "decreasing"
+    
+    # Prepare the prompt
+    prompt = f"""As a senior business analyst, provide a comprehensive trend analysis of this connectivity service performance:
+
+Historical Performance:
+- Average margin: {avg_margin:.1%} across {len(historical_data)} scenarios
+- Average coverage: {avg_coverage:.1f}%
+- Margin trend: {margin_trend}
+- Coverage trend: {coverage_trend}
+- Current margin: {current_metrics.get('margin', 0):.1%}
+- Current coverage: {current_metrics.get('coverage', 0):.1f}%
+
+Analyze the business implications, identify key patterns, and provide strategic recommendations. Focus on operational insights and actionable business intelligence.
+Keep it under 150 words. Use business terminology - refer to 'lines', 'customers', 'service coverage', NOT 'students' or 'educational'.
+IMPORTANT: Write as a single paragraph without line breaks or bullet points."""
+
+    try:
+        # Use Google AI Gemini API
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={api_key}"
+        
+        headers = {
+            'Content-Type': 'application/json',
+        }
+        
+        data = {
+            "contents": [{
+                "parts": [{
+                    "text": f"You are an expert business analyst providing strategic insights. Be analytical and professional. Write in a single paragraph without line breaks or bullet points.\n\n{prompt}"
+                }]
+            }],
+            "generationConfig": {
+                "temperature": 0.7,
+                "maxOutputTokens": 250,
+                "stopSequences": ["\n\n", "**", "##", "###"]
+            }
+        }
+        
+        response = requests.post(url, headers=headers, json=data, timeout=30)
+        
+        if response.status_code == 200:
+            result = response.json()
+            
+            # Extract the generated text from Google AI response
+            if 'candidates' in result and len(result['candidates']) > 0:
+                candidate = result['candidates'][0]
+                if 'content' in candidate and 'parts' in candidate['content']:
+                    narrative = candidate['content']['parts'][0]['text'].strip()
+                    
+                    # Clean up the narrative formatting
+                    narrative = _clean_ai_text(narrative)
+                    
+                    print(f"🔍 DEBUG: Google AI trend analysis success - generated {len(narrative)} character narrative")
+                    return narrative
+            
+            print("🔍 DEBUG: Google AI trend analysis response format unexpected")
+            return None
+        else:
+            print(f"🔍 DEBUG: Google AI trend analysis API error: {response.status_code} - {response.text}")
+            return None
+            
+    except Exception as e:
+        print(f"🔍 DEBUG: Google AI trend analysis API error: {e}")
+        return None
 
 def _generate_template_trend_analysis(historical_data: pd.DataFrame, current_metrics: Dict[str, Any]) -> str:
     """Generate template-based trend analysis when AI is not available."""
@@ -296,18 +392,29 @@ def _forecast_metric(data: pd.DataFrame, metric: str, periods: int) -> Dict[str,
         }
 
 def _generate_forecast_ai_insights(forecasts: Dict[str, Any], historical_data: pd.DataFrame) -> str:
-    """Generate AI insights for forecasting results."""
+    """Generate AI insights for forecasting results using Ollama, Google AI, or intelligent fallback."""
     
-    # Check if Ollama is available
+    # Try Ollama first (local AI)
     try:
         response = requests.get('http://localhost:11434/api/tags', timeout=2)
-        if response.status_code != 200:
-            return _generate_template_forecast_insights(forecasts, historical_data)
+        if response.status_code == 200:
+            print("🔍 DEBUG: Using Ollama for forecast insights")
+            ai_narrative = _generate_ollama_forecast_insights(forecasts, historical_data)
+            if ai_narrative:
+                return ai_narrative
     except Exception as e:
-        print(f"🔍 DEBUG: Ollama not available for forecast insights ({e}) - using fallback templates")
-        return _generate_template_forecast_insights(forecasts, historical_data)
+        print(f"🔍 DEBUG: Ollama not available for forecast insights ({e})")
 
-    print("🔍 DEBUG: Using Ollama for forecast insights")
+    # Try Google AI (cloud AI)
+    ai_narrative = _generate_google_ai_forecast_insights(forecasts, historical_data)
+    if ai_narrative:
+        return ai_narrative
+
+    # Fallback to intelligent templates
+    return _generate_template_forecast_insights(forecasts, historical_data)
+
+def _generate_ollama_forecast_insights(forecasts: Dict[str, Any], historical_data: pd.DataFrame) -> Optional[str]:
+    """Generate forecast insights using Ollama (local LLM)."""
 
     # Prepare forecast summary
     margin_trend = forecasts.get('margin', {}).get('trend', 'unknown')
@@ -376,11 +483,94 @@ IMPORTANT: Write as a single paragraph without line breaks or bullet points."""
                 continue
 
         print("🔍 DEBUG: No available models found in Ollama for forecast insights")
-        return _generate_template_forecast_insights(forecasts, historical_data)
+        return None
 
     except Exception as e:
         print(f"🔍 DEBUG: Ollama API error for forecast insights: {e}")
-        return _generate_template_forecast_insights(forecasts, historical_data)
+        return None
+
+def _generate_google_ai_forecast_insights(forecasts: Dict[str, Any], historical_data: pd.DataFrame) -> Optional[str]:
+    """Generate forecast insights using Google AI (Gemini API)."""
+    
+    # Check if Google AI API key is available
+    api_key = os.getenv('GOOGLE_AI_API_KEY')
+    if not api_key:
+        print("🔍 DEBUG: Google AI API key not found for forecast insights - using fallback templates")
+        return None
+    
+    print("🔍 DEBUG: Using Google AI for forecast insights")
+    
+    # Prepare forecast summary
+    margin_trend = forecasts.get('margin', {}).get('trend', 'unknown')
+    coverage_trend = forecasts.get('coverage', {}).get('trend', 'unknown')
+    revenue_trend = forecasts.get('revenue', {}).get('trend', 'unknown')
+    
+    avg_historical_margin = historical_data['margin'].mean()
+    avg_historical_coverage = historical_data['coverage'].mean()
+    
+    prompt = f"""As a senior business analyst, provide strategic forecasting insights for this connectivity service:
+
+Forecast Trends (next 6 periods):
+- Margin trend: {margin_trend}
+- Coverage trend: {coverage_trend}
+- Revenue trend: {revenue_trend}
+
+Historical Context:
+- Average historical margin: {avg_historical_margin:.1%}
+- Average historical coverage: {avg_historical_coverage:.1f}%
+- Data points analyzed: {len(historical_data)}
+
+Provide strategic recommendations, risk assessments, and business implications based on these forecasts. Focus on actionable insights for business planning.
+Keep it under 150 words. Use business terminology - refer to 'lines', 'customers', 'service coverage', NOT 'students' or 'educational'.
+IMPORTANT: Write as a single paragraph without line breaks or bullet points."""
+
+    try:
+        # Use Google AI Gemini API
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key={api_key}"
+        
+        headers = {
+            'Content-Type': 'application/json',
+        }
+        
+        data = {
+            "contents": [{
+                "parts": [{
+                    "text": f"You are an expert business analyst providing strategic forecasting insights. Be analytical and professional. Write in a single paragraph without line breaks or bullet points.\n\n{prompt}"
+                }]
+            }],
+            "generationConfig": {
+                "temperature": 0.7,
+                "maxOutputTokens": 250,
+                "stopSequences": ["\n\n", "**", "##", "###"]
+            }
+        }
+        
+        response = requests.post(url, headers=headers, json=data, timeout=30)
+        
+        if response.status_code == 200:
+            result = response.json()
+            
+            # Extract the generated text from Google AI response
+            if 'candidates' in result and len(result['candidates']) > 0:
+                candidate = result['candidates'][0]
+                if 'content' in candidate and 'parts' in candidate['content']:
+                    narrative = candidate['content']['parts'][0]['text'].strip()
+                    
+                    # Clean up the narrative formatting
+                    narrative = _clean_ai_text(narrative)
+                    
+                    print(f"🔍 DEBUG: Google AI forecast insights success - generated {len(narrative)} character narrative")
+                    return narrative
+            
+            print("🔍 DEBUG: Google AI forecast insights response format unexpected")
+            return None
+        else:
+            print(f"🔍 DEBUG: Google AI forecast insights API error: {response.status_code} - {response.text}")
+            return None
+            
+    except Exception as e:
+        print(f"🔍 DEBUG: Google AI forecast insights API error: {e}")
+        return None
 
 def _generate_template_forecast_insights(forecasts: Dict[str, Any], historical_data: pd.DataFrame) -> str:
     """Generate template-based forecast insights when AI is not available."""
@@ -489,9 +679,23 @@ def get_ai_insights_status() -> Dict[str, Any]:
         ollama_available = response.status_code == 200
     except:
         pass
+    
+    # Check if Google AI API key is available
+    google_ai_available = bool(os.getenv('GOOGLE_AI_API_KEY'))
+    
+    # Determine status message
+    if ollama_available and google_ai_available:
+        status = 'Ollama (Local) + Google AI (Cloud) available'
+    elif ollama_available:
+        status = 'Ollama (Local AI) available'
+    elif google_ai_available:
+        status = 'Google AI (Cloud) available'
+    else:
+        status = 'Using intelligent templates'
 
     return {
         'ollama_available': ollama_available,
+        'google_ai_available': google_ai_available,
         'fallback_available': True,
-        'status': 'Ollama (Local AI) available' if ollama_available else 'Using intelligent templates'
+        'status': status
     }
