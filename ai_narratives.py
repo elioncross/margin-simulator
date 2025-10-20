@@ -13,9 +13,13 @@ def _clean_narrative(text: str) -> str:
     """
     Clean up AI-generated narrative text to fix formatting issues.
     """
+    print(f"🔍 DEBUG: _clean_narrative input: '{text[:100]}...'")
+    
     # Remove excessive line breaks and normalize whitespace first
     text = re.sub(r'\n+', ' ', text)
     text = re.sub(r'\s+', ' ', text)
+    
+    print(f"🔍 DEBUG: _clean_narrative after whitespace: '{text[:100]}...'")
     
     # Fix character-by-character splitting issues
     # This is the main issue - AI is generating text with spaces between every character
@@ -71,6 +75,7 @@ def _clean_narrative(text: str) -> str:
     if text and not text.endswith(('.', '!', '?')):
         text += '.'
     
+    print(f"🔍 DEBUG: _clean_narrative output: '{text[:100]}...'")
     return text
 
 def generate_ai_narrative(metrics: Dict[str, Any], context: Dict[str, Any], view_type: str = "financial") -> str:
