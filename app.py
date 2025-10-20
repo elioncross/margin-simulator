@@ -569,20 +569,38 @@ def main():
             # Update SCO toggle to match scenario setting
             if 'sco_enabled' in scenarios['profitable']:
                 st.session_state.sco_enabled = scenarios['profitable']['sco_enabled']
+            else:
+                st.session_state.sco_enabled = False  # Reset to default for non-SCO scenarios
+            
             # Update policy to match scenario setting
             if 'policy' in scenarios['profitable']:
                 st.session_state.policy = scenarios['profitable']['policy']
-            # Update SCO parameters to match scenario settings
+            
+            # Update SCO parameters to match scenario settings or reset to defaults
             if 'base_plan_gb' in scenarios['profitable']:
                 st.session_state.base_plan_gb = scenarios['profitable']['base_plan_gb']
+            else:
+                st.session_state.base_plan_gb = scenarios['profitable']['cap']  # Default to customer cap
+            
             if 'sco_efficiency' in scenarios['profitable']:
                 st.session_state.sco_efficiency = scenarios['profitable']['sco_efficiency']
+            else:
+                st.session_state.sco_efficiency = 0.85  # Default efficiency
+            
             if 'overage_rate' in scenarios['profitable']:
                 st.session_state.overage_rate = scenarios['profitable']['overage_rate']
+            else:
+                st.session_state.overage_rate = 15.0  # Default overage rate
+            
             if 'plan_switching_cost' in scenarios['profitable']:
                 st.session_state.plan_switching_cost = scenarios['profitable']['plan_switching_cost']
+            else:
+                st.session_state.plan_switching_cost = 0.5  # Default switching cost
+            
             if 'monthly_usage_per_line' in scenarios['profitable']:
                 st.session_state.monthly_usage_per_line = scenarios['profitable']['monthly_usage_per_line']
+            else:
+                st.session_state.monthly_usage_per_line = 2.5  # Default usage
             # Trigger rerun to update the UI
             st.experimental_rerun()
     
@@ -592,20 +610,38 @@ def main():
             # Update SCO toggle to match scenario setting
             if 'sco_enabled' in scenarios['unprofitable']:
                 st.session_state.sco_enabled = scenarios['unprofitable']['sco_enabled']
+            else:
+                st.session_state.sco_enabled = False  # Reset to default for non-SCO scenarios
+            
             # Update policy to match scenario setting
             if 'policy' in scenarios['unprofitable']:
                 st.session_state.policy = scenarios['unprofitable']['policy']
-            # Update SCO parameters to match scenario settings
+            
+            # Update SCO parameters to match scenario settings or reset to defaults
             if 'base_plan_gb' in scenarios['unprofitable']:
                 st.session_state.base_plan_gb = scenarios['unprofitable']['base_plan_gb']
+            else:
+                st.session_state.base_plan_gb = scenarios['unprofitable']['cap']  # Default to customer cap
+            
             if 'sco_efficiency' in scenarios['unprofitable']:
                 st.session_state.sco_efficiency = scenarios['unprofitable']['sco_efficiency']
+            else:
+                st.session_state.sco_efficiency = 0.85  # Default efficiency
+            
             if 'overage_rate' in scenarios['unprofitable']:
                 st.session_state.overage_rate = scenarios['unprofitable']['overage_rate']
+            else:
+                st.session_state.overage_rate = 15.0  # Default overage rate
+            
             if 'plan_switching_cost' in scenarios['unprofitable']:
                 st.session_state.plan_switching_cost = scenarios['unprofitable']['plan_switching_cost']
+            else:
+                st.session_state.plan_switching_cost = 0.5  # Default switching cost
+            
             if 'monthly_usage_per_line' in scenarios['unprofitable']:
                 st.session_state.monthly_usage_per_line = scenarios['unprofitable']['monthly_usage_per_line']
+            else:
+                st.session_state.monthly_usage_per_line = 2.5  # Default usage
             # Trigger rerun to update the UI
             st.experimental_rerun()
     
@@ -631,22 +667,38 @@ def main():
         # Update SCO toggle to match scenario setting
         if 'sco_enabled' in scenario:
             st.session_state.sco_enabled = scenario['sco_enabled']
+        else:
+            st.session_state.sco_enabled = False  # Reset to default for non-SCO scenarios
         
         # Update policy to match scenario setting
         if 'policy' in scenario:
             st.session_state.policy = scenario['policy']
         
-        # Update SCO parameters to match scenario settings
+        # Update SCO parameters to match scenario settings or reset to defaults
         if 'base_plan_gb' in scenario:
             st.session_state.base_plan_gb = scenario['base_plan_gb']
+        else:
+            st.session_state.base_plan_gb = scenario['cap']  # Default to customer cap
+        
         if 'sco_efficiency' in scenario:
             st.session_state.sco_efficiency = scenario['sco_efficiency']
+        else:
+            st.session_state.sco_efficiency = 0.85  # Default efficiency
+        
         if 'overage_rate' in scenario:
             st.session_state.overage_rate = scenario['overage_rate']
+        else:
+            st.session_state.overage_rate = 15.0  # Default overage rate
+        
         if 'plan_switching_cost' in scenario:
             st.session_state.plan_switching_cost = scenario['plan_switching_cost']
+        else:
+            st.session_state.plan_switching_cost = 0.5  # Default switching cost
+        
         if 'monthly_usage_per_line' in scenario:
             st.session_state.monthly_usage_per_line = scenario['monthly_usage_per_line']
+        else:
+            st.session_state.monthly_usage_per_line = 2.5  # Default usage
         
         # Trigger rerun to update the UI
         st.experimental_rerun()
