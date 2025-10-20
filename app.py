@@ -961,14 +961,28 @@ def main():
                     
                     # Show which AI mode is being used
                     if ai_status['ollama_available']:
-                        st.info("🤖 **AI-Generated** (Ollama):")
-                        st.write(ai_narrative)
+                        ai_label = "🤖 **AI-Generated** (Ollama)"
                     elif ai_status['google_ai_available']:
-                        st.info("🤖 **AI-Generated** (Google AI):")
-                        st.write(ai_narrative)
+                        ai_label = "🤖 **AI-Generated** (Google AI)"
                     else:
-                        st.info("📝 **Smart Template**:")
-                        st.write(ai_narrative)
+                        ai_label = "📝 **Smart Template**"
+                    
+                    # Display using HTML to avoid browser rendering issues
+                    st.markdown(f"""
+                    <div style="
+                        background-color: #e3f2fd;
+                        border: 1px solid #2196f3;
+                        border-radius: 0.5rem;
+                        padding: 1rem;
+                        margin: 0.5rem 0;
+                        font-family: 'Source Sans Pro', sans-serif;
+                        font-size: 14px;
+                        line-height: 1.5;
+                    ">
+                        <strong>{ai_label}:</strong><br>
+                        {ai_narrative}
+                    </div>
+                    """, unsafe_allow_html=True)
             else:
                 # Enhanced fallback narrative
                 connected_lines = int(students * metrics['coverage'] / 100)
@@ -1089,16 +1103,40 @@ def main():
                     else:
                         ai_label = "📝 **Smart Template**"
                     
-                    # Display text separately to avoid browser rendering issues
+                    # Display text using HTML to avoid browser rendering issues
                     if metrics['margin'] > 0:
-                        st.success(ai_label + ":")
-                        st.write(ai_narrative)
+                        st.markdown(f"""
+                        <div style="
+                            background-color: #e8f5e8;
+                            border: 1px solid #4caf50;
+                            border-radius: 0.5rem;
+                            padding: 1rem;
+                            margin: 0.5rem 0;
+                            font-family: 'Source Sans Pro', sans-serif;
+                            font-size: 14px;
+                            line-height: 1.5;
+                        ">
+                            <strong>{ai_label}:</strong><br>
+                            {ai_narrative}
+                        </div>
+                        """, unsafe_allow_html=True)
                     elif metrics['margin'] == 0:
-                        st.warning(ai_label + ":")
-                        st.write(ai_narrative)
+                        st.markdown(f"""
+                        <div style="
+                            background-color: #fff3e0;
+                            border: 1px solid #ff9800;
+                            border-radius: 0.5rem;
+                            padding: 1rem;
+                            margin: 0.5rem 0;
+                            font-family: 'Source Sans Pro', sans-serif;
+                            font-size: 14px;
+                            line-height: 1.5;
+                        ">
+                            <strong>{ai_label}:</strong><br>
+                            {ai_narrative}
+                        </div>
+                        """, unsafe_allow_html=True)
                     else:
-                        st.error(ai_label + ":")
-                        # Try using HTML to avoid browser rendering issues
                         st.markdown(f"""
                         <div style="
                             background-color: #ffebee;
@@ -1110,6 +1148,7 @@ def main():
                             font-size: 14px;
                             line-height: 1.5;
                         ">
+                            <strong>{ai_label}:</strong><br>
                             {ai_narrative}
                         </div>
                         """, unsafe_allow_html=True)
@@ -1230,11 +1269,37 @@ def main():
                             ai_label = "📝 **Smart Template**"
                         
                         if result['feasible']:
-                            st.success(ai_label + ":")
-                            st.write(opt_narrative)
+                            st.markdown(f"""
+                            <div style="
+                                background-color: #e8f5e8;
+                                border: 1px solid #4caf50;
+                                border-radius: 0.5rem;
+                                padding: 1rem;
+                                margin: 0.5rem 0;
+                                font-family: 'Source Sans Pro', sans-serif;
+                                font-size: 14px;
+                                line-height: 1.5;
+                            ">
+                                <strong>{ai_label}:</strong><br>
+                                {opt_narrative}
+                            </div>
+                            """, unsafe_allow_html=True)
                         else:
-                            st.error(ai_label + ":")
-                            st.write(opt_narrative)
+                            st.markdown(f"""
+                            <div style="
+                                background-color: #ffebee;
+                                border: 1px solid #f44336;
+                                border-radius: 0.5rem;
+                                padding: 1rem;
+                                margin: 0.5rem 0;
+                                font-family: 'Source Sans Pro', sans-serif;
+                                font-size: 14px;
+                                line-height: 1.5;
+                            ">
+                                <strong>{ai_label}:</strong><br>
+                                {opt_narrative}
+                            </div>
+                            """, unsafe_allow_html=True)
                 else:
                     # Fallback to static message
                     st.info("🎯 **Optimization Complete:** Found optimal pricing and data cap configuration for maximum profitability.")
