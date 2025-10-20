@@ -173,11 +173,15 @@ IMPORTANT: Write as a single paragraph without line breaks or bullet points."""
                 
                 if response.status_code == 200:
                     result = response.json()
-                    narrative = result['response'].strip()
+                    raw_narrative = result['response'].strip()
+                    
+                    # Debug: Show raw response to understand the issue
+                    print(f"🔍 DEBUG: Raw Ollama response from {model_name}: '{raw_narrative[:100]}...'")
                     
                     # Clean up the narrative formatting
-                    narrative = _clean_narrative(narrative)
+                    narrative = _clean_narrative(raw_narrative)
                     
+                    print(f"🔍 DEBUG: Cleaned narrative: '{narrative[:100]}...'")
                     print(f"🔍 DEBUG: Ollama success with {model_name} - generated {len(narrative)} character narrative")
                     return narrative
                 elif response.status_code == 404:
@@ -262,15 +266,24 @@ IMPORTANT: Write as a single paragraph without line breaks or bullet points."""
         if response.status_code == 200:
             result = response.json()
             
+            # Debug: Show raw response structure
+            print(f"🔍 DEBUG: Google AI raw response keys: {list(result.keys())}")
+            
             # Extract the generated text from Google AI response
             if 'candidates' in result and len(result['candidates']) > 0:
                 candidate = result['candidates'][0]
+                print(f"🔍 DEBUG: Google AI candidate keys: {list(candidate.keys())}")
+                
                 if 'content' in candidate and 'parts' in candidate['content']:
-                    narrative = candidate['content']['parts'][0]['text'].strip()
+                    raw_narrative = candidate['content']['parts'][0]['text'].strip()
+                    
+                    # Debug: Show raw narrative
+                    print(f"🔍 DEBUG: Google AI raw narrative: '{raw_narrative[:100]}...'")
                     
                     # Clean up the narrative formatting
-                    narrative = _clean_narrative(narrative)
+                    narrative = _clean_narrative(raw_narrative)
                     
+                    print(f"🔍 DEBUG: Google AI cleaned narrative: '{narrative[:100]}...'")
                     print(f"🔍 DEBUG: Google AI success - generated {len(narrative)} character narrative")
                     return narrative
             
