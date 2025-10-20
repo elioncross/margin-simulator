@@ -727,12 +727,19 @@ def main():
     st.sidebar.markdown("---")
     st.sidebar.subheader("🤖 AI Narratives")
     
-    # AI narrative toggle
+    # AI narrative toggle (persistent in session state)
+    if 'enable_ai_narratives' not in st.session_state:
+        st.session_state.enable_ai_narratives = False
+    
     enable_ai_narratives = st.sidebar.checkbox(
         "Enable AI Narratives",
-        value=False,
-        help="Generate AI-powered contextual narratives for better insights"
+        value=st.session_state.enable_ai_narratives,
+        help="Generate AI-powered contextual narratives for better insights",
+        key="ai_narrative_toggle"
     )
+    
+    # Update session state when toggle changes
+    st.session_state.enable_ai_narratives = enable_ai_narratives
     
     # Show AI status
     ai_status = get_ai_narrative_status()
