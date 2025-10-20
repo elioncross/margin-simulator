@@ -662,59 +662,90 @@ def main():
     st.sidebar.markdown("---")
     st.sidebar.subheader("🎯 Smart Cost Optimization (SCO)")
     
-    # SCO toggle
+    # SCO toggle (persistent in session state)
+    if 'sco_enabled' not in st.session_state:
+        st.session_state.sco_enabled = current.get('sco_enabled', False)
+    
     sco_enabled = st.sidebar.checkbox(
         "Enable SCO",
-        value=current.get('sco_enabled', False),
-        help="Enable intelligent cost optimization to reduce overage costs"
+        value=st.session_state.sco_enabled,
+        help="Enable intelligent cost optimization to reduce overage costs",
+        key="sco_toggle"
     )
     
+    # Update session state when toggle changes
+    st.session_state.sco_enabled = sco_enabled
+    
     if sco_enabled:
+        # Initialize SCO parameters in session state
+        if 'base_plan_gb' not in st.session_state:
+            st.session_state.base_plan_gb = current.get('base_plan_gb', 3.0)
+        if 'sco_efficiency' not in st.session_state:
+            st.session_state.sco_efficiency = current.get('sco_efficiency', 0.85)
+        if 'overage_rate' not in st.session_state:
+            st.session_state.overage_rate = current.get('overage_rate', 15.0)
+        if 'plan_switching_cost' not in st.session_state:
+            st.session_state.plan_switching_cost = current.get('plan_switching_cost', 0.5)
+        if 'monthly_usage_per_line' not in st.session_state:
+            st.session_state.monthly_usage_per_line = current.get('monthly_usage_per_line', 2.5)
+        
         # SCO-specific parameters
         base_plan_gb = st.sidebar.slider(
             "Base Plan Size (GB)",
             min_value=1.0,
             max_value=8.0,
-            value=current.get('base_plan_gb', 3.0),
+            value=st.session_state.base_plan_gb,
             step=0.5,
-            help="Internal base plan size (smaller than customer cap)"
+            help="Internal base plan size (smaller than customer cap)",
+            key="base_plan_gb_slider"
         )
         
         sco_efficiency = st.sidebar.slider(
             "SCO Efficiency (%)",
             min_value=50,
             max_value=95,
-            value=int(current.get('sco_efficiency', 0.85) * 100),
+            value=int(st.session_state.sco_efficiency * 100),
             step=5,
-            help="How well SCO prevents overages (85% = prevents 85% of potential overages)"
+            help="How well SCO prevents overages (85% = prevents 85% of potential overages)",
+            key="sco_efficiency_slider"
         ) / 100.0
         
         overage_rate = st.sidebar.number_input(
             "Overage Rate ($/GB)",
             min_value=5.0,
             max_value=25.0,
-            value=current.get('overage_rate', 15.0),
+            value=st.session_state.overage_rate,
             step=1.0,
-            help="Cost per GB for overage charges"
+            help="Cost per GB for overage charges",
+            key="overage_rate_input"
         )
         
         plan_switching_cost = st.sidebar.number_input(
             "Plan Switching Cost ($/line)",
             min_value=0.1,
             max_value=2.0,
-            value=current.get('plan_switching_cost', 0.5),
+            value=st.session_state.plan_switching_cost,
             step=0.1,
-            help="Cost per line when switching plans (lower = more efficient SCO)"
+            help="Cost per line when switching plans (lower = more efficient SCO)",
+            key="plan_switching_cost_input"
         )
         
         monthly_usage_per_line = st.sidebar.number_input(
             "Monthly Usage per Line (GB)",
             min_value=0.5,
             max_value=10.0,
-            value=current.get('monthly_usage_per_line', 2.5),
+            value=st.session_state.monthly_usage_per_line,
             step=0.1,
-            help="Average monthly data consumption per line (realistic usage pattern)"
+            help="Average monthly data consumption per line (realistic usage pattern)",
+            key="monthly_usage_per_line_input"
         )
+        
+        # Update session state when SCO parameters change
+        st.session_state.base_plan_gb = base_plan_gb
+        st.session_state.sco_efficiency = sco_efficiency
+        st.session_state.overage_rate = overage_rate
+        st.session_state.plan_switching_cost = plan_switching_cost
+        st.session_state.monthly_usage_per_line = monthly_usage_per_line
     else:
         # Default values when SCO is disabled
         base_plan_gb = cap  # Same as customer cap
@@ -767,23 +798,35 @@ def main():
     
     st.sidebar.markdown("**Optimize your pricing and data caps for better margins:**")
     
+    # Initialize optimization settings in session state
+    if 'min_coverage' not in st.session_state:
+        st.session_state.min_coverage = 80.0
+    if 'min_margin' not in st.session_state:
+        st.session_state.min_margin = 0.0
+    
     min_coverage = st.sidebar.slider(
         "Minimum Coverage (%)",
         min_value=0.0,
         max_value=100.0,
-        value=80.0,
+        value=st.session_state.min_coverage,
         step=5.0,
-        help="Minimum student coverage percentage required"
+        help="Minimum student coverage percentage required",
+        key="min_coverage_slider"
     )
     
     min_margin = st.sidebar.slider(
         "Minimum Margin (%)",
         min_value=0.0,
         max_value=50.0,
-        value=0.0,
+        value=st.session_state.min_margin,
         step=1.0,
-        help="Minimum profit margin required (0% = break-even)"
+        help="Minimum profit margin required (0% = break-even)",
+        key="min_margin_slider"
     )
+    
+    # Update session state when sliders change
+    st.session_state.min_coverage = min_coverage
+    st.session_state.min_margin = min_margin
     
     if st.sidebar.button("🚀 Find Optimal Pricing", type="primary"):
         with st.spinner("🔍 Analyzing pricing and data cap combinations..."):
