@@ -17,7 +17,23 @@ def _clean_narrative(text: str) -> str:
     text = re.sub(r'\n+', ' ', text)
     text = re.sub(r'\s+', ' ', text)
     
-    # Fix specific problematic patterns that cause character splitting
+    # Fix character-by-character splitting issues
+    # This is the main issue - AI is generating text with spaces between every character
+    
+    # Fix common words that get split: "r e v e n u e" -> "revenue"
+    common_words = [
+        'revenue', 'budget', 'margin', 'coverage', 'throttling', 'underperformed',
+        'achieving', 'against', 'versus', 'critically', 'indicates', 'unsustainable',
+        'operational', 'costs', 'performance', 'analysis', 'scenario', 'profitable',
+        'unprofitable', 'excellent', 'improvement', 'utilization', 'economics'
+    ]
+    
+    for word in common_words:
+        # Create pattern for split word: "r e v e n u e" -> "revenue"
+        split_pattern = r'\b' + r'\s+'.join(word) + r'\b'
+        text = re.sub(split_pattern, word, text, flags=re.IGNORECASE)
+    
+    # Fix specific problematic patterns
     # Fix the specific pattern: "10.00/GBwith3.5GBcap" -> "10.00/GB with 3.5GB cap"
     text = re.sub(r'(\d+\.\d+)/GBwith(\d+\.\d+)GBcap', r'\1/GB with \2GB cap', text)
     
