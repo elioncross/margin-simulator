@@ -79,13 +79,17 @@ def generate_ai_narrative(metrics: Dict[str, Any], context: Dict[str, Any], view
     """
     
     # Try Ollama first (local AI)
+    print(f"🔍 DEBUG: Trying Ollama for {view_type} narrative")
     ai_narrative = _generate_ollama_narrative(metrics, context, view_type)
     if ai_narrative:
+        print(f"🔍 DEBUG: Ollama success for {view_type} narrative")
         return ai_narrative
     
     # Try Google AI (cloud AI)
+    print(f"🔍 DEBUG: Trying Google AI for {view_type} narrative")
     ai_narrative = _generate_google_ai_narrative(metrics, context, view_type)
     if ai_narrative:
+        print(f"🔍 DEBUG: Google AI success for {view_type} narrative")
         return ai_narrative
     
     # Fallback to intelligent templates
@@ -194,6 +198,7 @@ def _generate_google_ai_narrative(metrics: Dict[str, Any], context: Dict[str, An
     
     # Check if Google AI API key is available
     api_key = os.getenv('GOOGLE_AI_API_KEY')
+    print(f"🔍 DEBUG: Google AI narrative generation - API key present: {bool(api_key)}")
     if not api_key:
         print("🔍 DEBUG: Google AI API key not found - using fallback templates")
         return None
@@ -464,6 +469,7 @@ def _generate_google_ai_optimization_narrative(optimization_result: Dict[str, An
     
     # Check if Google AI API key is available
     api_key = os.getenv('GOOGLE_AI_API_KEY')
+    print(f"🔍 DEBUG: Google AI optimization narrative - API key present: {bool(api_key)}")
     if not api_key:
         print("🔍 DEBUG: Google AI API key not found for optimization - using fallback templates")
         return None
@@ -612,7 +618,11 @@ def get_ai_narrative_status() -> Dict[str, Any]:
     
     # Check if Google AI API key is available
     api_key = os.getenv('GOOGLE_AI_API_KEY')
+    print(f"🔍 DEBUG: Google AI API key check - Present: {bool(api_key)}, Length: {len(api_key) if api_key else 0}")
     google_ai_available = bool(api_key)
+    
+    if not api_key:
+        print("🔍 DEBUG: Google AI API key not found - using fallback templates")
     
     # Debug information for troubleshooting
     debug_info = {
