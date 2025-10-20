@@ -566,12 +566,12 @@ def main():
     with col1:
         if st.button("✅ Profitable Example", help="Load profitable scenario", key="sidebar_profitable_example"):
             st.session_state.current_scenario = scenarios['profitable']
-            st.experimental_rerun()
+            st.rerun()
     
     with col2:
         if st.button("❌ Unprofitable Example", help="Load unprofitable scenario", key="sidebar_unprofitable_example"):
             st.session_state.current_scenario = scenarios['unprofitable']
-            st.experimental_rerun()
+            st.rerun()
     
     # Dropdown for all scenarios
     scenario_options = {f"{k}: {v['name']}": k for k, v in scenarios.items()}
@@ -585,7 +585,7 @@ def main():
         scenario_key = scenario_options[selected_scenario_key]
         scenario = get_scenario(scenario_key)
         st.session_state.current_scenario = scenario
-        st.experimental_rerun()
+        st.rerun()
     
     # Manual input controls
     st.sidebar.subheader("⚙️ Manual Configuration")
@@ -792,7 +792,7 @@ def main():
             else:
                 st.sidebar.error("❌ No feasible solution found. Try relaxing constraints.")
             # Force rerun to show notification
-            st.experimental_rerun()
+            st.rerun()
     
     # Calculate metrics (use SCO if enabled)
     if sco_enabled:
@@ -1197,7 +1197,7 @@ def main():
                     current_scenario['customer_price'] = result['recommended_customer_price']
                     current_scenario['cap'] = result['recommended_cap']
                     st.session_state.current_scenario = current_scenario
-                    st.experimental_rerun()
+                    st.rerun()
             else:
                 st.error("❌ " + result['message'])
                 st.info("💡 Try relaxing your minimum coverage or margin requirements")
