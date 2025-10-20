@@ -269,7 +269,7 @@ def display_help_guide():
         Analyze connectivity service performance across different scenarios and stakeholder perspectives.
         
         ### Quick Start:
-        1. **Load a Scenario**: Use the sidebar to select "Profitable Example" or "Unprofitable Example"
+        1. **Load a Scenario**: Use the dropdown in the sidebar to select a predefined scenario (defaults to "Profitable Example")
         2. **Adjust Parameters**: Modify lines, data caps, pricing, or business types
         3. **View Results**: Switch between tabs to see different perspectives
         4. **Get Insights**: Use AI features for advanced analysis
@@ -339,7 +339,7 @@ def display_help_guide():
         - **Plan Switching Cost**: Cost per line when switching plans
         
         ### Predefined Scenarios:
-        - **✅ Profitable Example**: High margin, good coverage scenario
+        - **✅ Profitable Example**: High margin, good coverage scenario (default)
         - **❌ Unprofitable Example**: Low margin, budget-constrained scenario
         - **High Volume**: Large number of lines
         - **Premium**: High-end pricing scenario
@@ -560,120 +560,17 @@ def main():
     
     # Scenario selection with improved labeling
     st.sidebar.subheader("📋 Load Predefined Scenarios")
+    st.sidebar.caption("Select a scenario from the dropdown below to load predefined parameters.")
     
-    # Quick scenario buttons
-    col1, col2 = st.sidebar.columns(2)
-    with col1:
-        if st.button("✅ Profitable Example", help="Load profitable scenario", key="sidebar_profitable_example"):
-            st.session_state.current_scenario = scenarios['profitable']
-            # Update SCO toggle to match scenario setting
-            if 'sco_enabled' in scenarios['profitable']:
-                st.session_state.sco_enabled = scenarios['profitable']['sco_enabled']
-            else:
-                st.session_state.sco_enabled = False  # Reset to default for non-SCO scenarios
-            
-            # Update policy to match scenario setting
-            if 'policy' in scenarios['profitable']:
-                st.session_state.policy = scenarios['profitable']['policy']
-            
-            # Update SCO parameters to match scenario settings or reset to defaults
-            if 'base_plan_gb' in scenarios['profitable']:
-                st.session_state.base_plan_gb = scenarios['profitable']['base_plan_gb']
-            else:
-                st.session_state.base_plan_gb = scenarios['profitable']['cap']  # Default to customer cap
-            
-            if 'sco_efficiency' in scenarios['profitable']:
-                st.session_state.sco_efficiency = scenarios['profitable']['sco_efficiency']
-            else:
-                st.session_state.sco_efficiency = 0.85  # Default efficiency
-            
-            if 'overage_rate' in scenarios['profitable']:
-                st.session_state.overage_rate = scenarios['profitable']['overage_rate']
-            else:
-                st.session_state.overage_rate = 15.0  # Default overage rate
-            
-            if 'plan_switching_cost' in scenarios['profitable']:
-                st.session_state.plan_switching_cost = scenarios['profitable']['plan_switching_cost']
-            else:
-                st.session_state.plan_switching_cost = 0.5  # Default switching cost
-            
-            if 'monthly_usage_per_line' in scenarios['profitable']:
-                st.session_state.monthly_usage_per_line = scenarios['profitable']['monthly_usage_per_line']
-            else:
-                st.session_state.monthly_usage_per_line = 2.5  # Default usage
-            
-            # Clear optimization and AI results to prevent contamination
-            if 'optimization_result' in st.session_state:
-                del st.session_state.optimization_result
-            if 'optimization_completed' in st.session_state:
-                del st.session_state.optimization_completed
-            if 'trend_analysis_result' in st.session_state:
-                del st.session_state.trend_analysis_result
-            if 'forecast_results' in st.session_state:
-                del st.session_state.forecast_results
-            
-            # Trigger rerun to update the UI
-            st.experimental_rerun()
     
-    with col2:
-        if st.button("❌ Unprofitable Example", help="Load unprofitable scenario", key="sidebar_unprofitable_example"):
-            st.sidebar.write("🔍 Button clicked! Loading unprofitable scenario...")
-            st.session_state.current_scenario = scenarios['unprofitable']
-            # Update SCO toggle to match scenario setting
-            if 'sco_enabled' in scenarios['unprofitable']:
-                st.session_state.sco_enabled = scenarios['unprofitable']['sco_enabled']
-            else:
-                st.session_state.sco_enabled = False  # Reset to default for non-SCO scenarios
-            
-            # Update policy to match scenario setting
-            if 'policy' in scenarios['unprofitable']:
-                st.session_state.policy = scenarios['unprofitable']['policy']
-            
-            # Update SCO parameters to match scenario settings or reset to defaults
-            if 'base_plan_gb' in scenarios['unprofitable']:
-                st.session_state.base_plan_gb = scenarios['unprofitable']['base_plan_gb']
-            else:
-                st.session_state.base_plan_gb = scenarios['unprofitable']['cap']  # Default to customer cap
-            
-            if 'sco_efficiency' in scenarios['unprofitable']:
-                st.session_state.sco_efficiency = scenarios['unprofitable']['sco_efficiency']
-            else:
-                st.session_state.sco_efficiency = 0.85  # Default efficiency
-            
-            if 'overage_rate' in scenarios['unprofitable']:
-                st.session_state.overage_rate = scenarios['unprofitable']['overage_rate']
-            else:
-                st.session_state.overage_rate = 15.0  # Default overage rate
-            
-            if 'plan_switching_cost' in scenarios['unprofitable']:
-                st.session_state.plan_switching_cost = scenarios['unprofitable']['plan_switching_cost']
-            else:
-                st.session_state.plan_switching_cost = 0.5  # Default switching cost
-            
-            if 'monthly_usage_per_line' in scenarios['unprofitable']:
-                st.session_state.monthly_usage_per_line = scenarios['unprofitable']['monthly_usage_per_line']
-            else:
-                st.session_state.monthly_usage_per_line = 2.5  # Default usage
-            
-            # Clear optimization and AI results to prevent contamination
-            if 'optimization_result' in st.session_state:
-                del st.session_state.optimization_result
-            if 'optimization_completed' in st.session_state:
-                del st.session_state.optimization_completed
-            if 'trend_analysis_result' in st.session_state:
-                del st.session_state.trend_analysis_result
-            if 'forecast_results' in st.session_state:
-                del st.session_state.forecast_results
-            
-            # Trigger rerun to update the UI
-            st.experimental_rerun()
-    
-    # Dropdown for all scenarios
+    # Dropdown for all scenarios - default to profitable scenario
     scenario_options = {f"{k}: {v['name']}": k for k, v in scenarios.items()}
+    # Find the index of the profitable scenario
+    profitable_index = list(scenario_options.keys()).index("profitable: Profitable Example")
     selected_scenario_key = st.sidebar.selectbox(
         "Choose a scenario:",
         options=list(scenario_options.keys()),
-        index=0,
+        index=profitable_index,
         key="scenario_selectbox"
     )
     
@@ -739,19 +636,13 @@ def main():
     # Manual input controls
     st.sidebar.subheader("⚙️ Manual Configuration")
     
-    # Initialize session state if not exists
+    # Initialize session state if not exists - default to profitable scenario
     if 'current_scenario' not in st.session_state:
         st.session_state.current_scenario = scenarios['profitable']
     
     # Get current scenario AFTER all scenario loading logic has completed
     current = st.session_state.current_scenario
     
-    # Debug: Show what scenario is actually loaded
-    st.sidebar.write(f"🔍 Loaded Scenario: {current.get('name', 'Unknown')}")
-    st.sidebar.write(f"  - carrier_rate: {current.get('carrier_rate', 'N/A')}")
-    st.sidebar.write(f"  - customer_price: {current.get('customer_price', 'N/A')}")
-    st.sidebar.write(f"  - budget: {current.get('budget', 'N/A')}")
-    st.sidebar.write(f"  - monthly_usage_per_line: {current.get('monthly_usage_per_line', 'N/A')}")
     
     # Input controls
     students = st.sidebar.slider(
