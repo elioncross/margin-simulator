@@ -77,9 +77,9 @@ SCENARIOS = {
         'students': 500,
         'cap': 8.0,  # What customer sees
         'base_plan_gb': 3.0,  # Internal base plan
-        'budget': 15000.0,
-        'carrier_rate': 8.0,
-        'customer_price': 25.0,  # Realistic enterprise pricing
+        'budget': 20000.0,  # Higher budget to ensure profitability
+        'carrier_rate': 6.0,  # Lower carrier rate for enterprise
+        'customer_price': 35.0,  # Higher enterprise pricing
         'policy': 'Enterprise',
         'throttling': True,
         'sco_enabled': True,
@@ -110,9 +110,9 @@ SCENARIOS = {
         'description': 'Enterprise scenario without SCO for comparison',
         'students': 500,
         'cap': 8.0,
-        'budget': 15000.0,
-        'carrier_rate': 8.0,
-        'customer_price': 25.0,  # Same pricing as SCO enterprise
+        'budget': 20000.0,  # Same budget as SCO enterprise
+        'carrier_rate': 6.0,  # Same carrier rate as SCO enterprise
+        'customer_price': 35.0,  # Same pricing as SCO enterprise
         'policy': 'Enterprise',
         'throttling': True,
         'sco_enabled': False,
