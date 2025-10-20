@@ -1434,9 +1434,16 @@ def main():
             if st.button("🔍 Generate AI Trend Analysis", type="primary", key="ai_trend_analysis_1"):
                 with st.spinner("🤖 AI is analyzing trends..."):
                     trend_analysis = generate_trend_analysis(synthetic_data, current_metrics)
-                    
-                    st.markdown("#### 🧠 AI Insights:")
-                    st.write(trend_analysis)
+                    st.session_state.trend_analysis_result = trend_analysis
+            
+            # Display trend analysis results if available
+            if 'trend_analysis_result' in st.session_state:
+                st.markdown("#### 🧠 AI Insights:")
+                # Show which AI mode is being used
+                if ai_insights_status['ollama_available']:
+                    st.info(f"🤖 **AI-Generated** (Ollama): {st.session_state.trend_analysis_result}")
+                else:
+                    st.info(f"📝 **Smart Template**: {st.session_state.trend_analysis_result}")
             
             # AI Forecasting
             st.subheader("🔮 AI Forecasting & Predictions")
@@ -1453,43 +1460,52 @@ def main():
             if st.button("🔮 Generate AI Forecasts", type="primary", key="ai_forecasts_1"):
                 with st.spinner("🤖 AI is generating forecasts..."):
                     forecast_results = generate_forecasting_insights(synthetic_data, forecast_periods)
-                    
-                    st.markdown("#### 🧠 AI Forecast Insights:")
-                    st.write(forecast_results['ai_insights'])
-                    
-                    # Display forecast chart
-                    st.markdown("#### 📈 Forecast Visualization:")
-                    forecast_chart = create_forecast_chart(forecast_results, synthetic_data)
-                    st.pyplot(forecast_chart)
-                    
-                    # Model accuracy
-                    st.markdown("#### 📊 Model Accuracy:")
-                    col1, col2, col3 = st.columns(3)
-                    
-                    with col1:
-                        st.metric("Margin R²", f"{forecast_results['model_accuracy']['margin_r2']:.3f}")
-                    with col2:
-                        st.metric("Coverage R²", f"{forecast_results['model_accuracy']['coverage_r2']:.3f}")
-                    with col3:
-                        st.metric("Revenue R²", f"{forecast_results['model_accuracy']['revenue_r2']:.3f}")
-                    
-                    # Forecast summary table
-                    st.markdown("#### 📋 Forecast Summary:")
-                    forecast_data = []
-                    for period in range(1, forecast_periods + 1):
-                        max_periods = len(forecast_results['forecasts']['margin']['values'])
-                        if period <= max_periods:
-                            row = {
-                                'Period': f"Month {period}",
-                                'Margin (%)': f"{forecast_results['forecasts']['margin']['values'][period-1]*100:.1f}",
-                                'Coverage (%)': f"{forecast_results['forecasts']['coverage']['values'][period-1]:.1f}",
-                                'Revenue ($)': f"{forecast_results['forecasts']['revenue']['values'][period-1]:,.0f}"
-                            }
-                            forecast_data.append(row)
-                    
-                    if forecast_data:
-                        forecast_df = pd.DataFrame(forecast_data)
-                        st.dataframe(forecast_df, use_container_width=True)
+                    st.session_state.forecast_results = forecast_results
+            
+            # Display forecast results if available
+            if 'forecast_results' in st.session_state:
+                forecast_results = st.session_state.forecast_results
+                
+                st.markdown("#### 🧠 AI Forecast Insights:")
+                # Show which AI mode is being used
+                if ai_insights_status['ollama_available']:
+                    st.success(f"🤖 **AI-Generated** (Ollama): {forecast_results['ai_insights']}")
+                else:
+                    st.success(f"📝 **Smart Template**: {forecast_results['ai_insights']}")
+                
+                # Display forecast chart
+                st.markdown("#### 📈 Forecast Visualization:")
+                forecast_chart = create_forecast_chart(forecast_results, synthetic_data)
+                st.pyplot(forecast_chart)
+                
+                # Model accuracy
+                st.markdown("#### 📊 Model Accuracy:")
+                col1, col2, col3 = st.columns(3)
+                
+                with col1:
+                    st.metric("Margin R²", f"{forecast_results['model_accuracy']['margin_r2']:.3f}")
+                with col2:
+                    st.metric("Coverage R²", f"{forecast_results['model_accuracy']['coverage_r2']:.3f}")
+                with col3:
+                    st.metric("Revenue R²", f"{forecast_results['model_accuracy']['revenue_r2']:.3f}")
+                
+                # Forecast summary table
+                st.markdown("#### 📋 Forecast Summary:")
+                forecast_data = []
+                for period in range(1, forecast_periods + 1):
+                    max_periods = len(forecast_results['forecasts']['margin']['values'])
+                    if period <= max_periods:
+                        row = {
+                            'Period': f"Month {period}",
+                            'Margin (%)': f"{forecast_results['forecasts']['margin']['values'][period-1]*100:.1f}",
+                            'Coverage (%)': f"{forecast_results['forecasts']['coverage']['values'][period-1]:.1f}",
+                            'Revenue ($)': f"{forecast_results['forecasts']['revenue']['values'][period-1]:,.0f}"
+                        }
+                        forecast_data.append(row)
+                
+                if forecast_data:
+                    forecast_df = pd.DataFrame(forecast_data)
+                    st.dataframe(forecast_df, use_container_width=True)
             
             # Advanced Analytics
             st.subheader("📊 Advanced Analytics")
