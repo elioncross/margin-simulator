@@ -29,18 +29,7 @@ def _get_google_ai_api_key() -> str:
     if api_key:
         return api_key
     
-    # Only try Streamlit secrets in cloud environments
-    # Check environment variables first to avoid any secrets access
-    is_cloud_env = (
-        'STREAMLIT_CLOUD' in os.environ or 
-        'STREAMLIT_SHARING' in os.environ
-    )
-    
-    if not is_cloud_env:
-        # Running locally - don't try to access secrets to avoid warnings
-        return None
-    
-    # Running in cloud - try to access secrets
+    # Try Streamlit secrets (handle errors gracefully to avoid local warnings)
     try:
         import streamlit as st
         # Try multiple access patterns for the API key
