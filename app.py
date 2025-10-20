@@ -772,9 +772,6 @@ def main():
             key="base_plan_gb_slider"
         )
         
-        # Debug: Show the session state value
-        st.sidebar.write(f"Debug: sco_efficiency = {st.session_state.sco_efficiency}")
-        
         sco_efficiency = st.sidebar.slider(
             "SCO Efficiency (%)",
             min_value=50,
@@ -784,9 +781,6 @@ def main():
             help="How well SCO prevents overages (85% = prevents 85% of potential overages)",
             key="sco_efficiency_slider"
         ) / 100.0
-        
-        # Debug: Show the calculated value
-        st.sidebar.write(f"Debug: calculated sco_efficiency = {sco_efficiency}")
         
         overage_rate = st.sidebar.number_input(
             "Overage Rate ($/GB)",
@@ -1290,7 +1284,7 @@ def main():
                     f"Revenue / (Lines × Monthly Price per Line) × 100\n= ${metrics['revenue']:,.2f} / ({students} × ${customer_price:.2f}) × 100",
                     f"Revenue / Budget × 100\n= ${metrics['revenue']:,.2f} / ${budget:,.2f} × 100",
                     f"Budget - Revenue\n= ${budget:,.2f} - ${metrics['revenue']:,.2f}",
-                    f"SCO Efficiency Setting\n= {st.session_state.sco_efficiency:.1%} (raw: {st.session_state.sco_efficiency})",
+                    f"SCO Efficiency Setting\n= {st.session_state.sco_efficiency:.1%}",
                     f"SCO Savings / SCO Costs\n= ${metrics.get('sco_savings', {}).get('total_savings', 0):,.2f} / ${metrics.get('sco_savings', {}).get('total_costs', 1):,.2f}"
                 ]
             }
