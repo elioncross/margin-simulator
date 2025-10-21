@@ -650,7 +650,7 @@ def main():
             del st.session_state.forecast_results
         
         # Trigger rerun to update the UI
-        st.experimental_rerun()
+        st.rerun()
     
     # Manual input controls
     st.sidebar.subheader("⚙️ Manual Configuration")
@@ -916,7 +916,7 @@ def main():
                 st.sidebar.error("❌ No feasible solution found. Try relaxing constraints.")
             # Force rerun to show notification
             # Trigger rerun to update the UI
-            st.experimental_rerun()
+            st.rerun()
     
     # Calculate metrics (use SCO if enabled)
     if sco_enabled:
@@ -1448,7 +1448,7 @@ def main():
                     current_scenario['cap'] = result['recommended_cap']
                     st.session_state.current_scenario = current_scenario
                     # Trigger rerun to update the UI
-                    st.experimental_rerun()
+                    st.rerun()
             else:
                 st.error("❌ " + result['message'])
                 st.info("💡 Try relaxing your minimum coverage or margin requirements")
