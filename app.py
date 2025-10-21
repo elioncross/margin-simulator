@@ -17,6 +17,14 @@ from scenarios import get_scenario, get_all_scenarios
 from ai_narratives import generate_ai_narrative, generate_optimization_narrative, get_ai_narrative_status
 from ai_insights import generate_trend_analysis, generate_forecasting_insights, create_forecast_chart, get_ai_insights_status
 
+# Compatibility wrapper for st.rerun() and st.experimental_rerun()
+def safe_rerun():
+    """Compatibility wrapper for st.rerun() and st.experimental_rerun()"""
+    try:
+        safe_rerun()
+    except AttributeError:
+        st.experimental_rerun()
+
 # Page configuration
 st.set_page_config(
     page_title="Margin Impact Simulator",
@@ -650,7 +658,7 @@ def main():
             del st.session_state.forecast_results
         
         # Trigger rerun to update the UI
-        st.rerun()
+        safe_rerun()
     
     # Manual input controls
     st.sidebar.subheader("⚙️ Manual Configuration")
@@ -916,7 +924,7 @@ def main():
                 st.sidebar.error("❌ No feasible solution found. Try relaxing constraints.")
             # Force rerun to show notification
             # Trigger rerun to update the UI
-            st.rerun()
+            safe_rerun()
     
     # Calculate metrics (use SCO if enabled)
     if sco_enabled:
@@ -1448,7 +1456,7 @@ def main():
                     current_scenario['cap'] = result['recommended_cap']
                     st.session_state.current_scenario = current_scenario
                     # Trigger rerun to update the UI
-                    st.rerun()
+                    safe_rerun()
             else:
                 st.error("❌ " + result['message'])
                 st.info("💡 Try relaxing your minimum coverage or margin requirements")
