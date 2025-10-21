@@ -4,7 +4,7 @@ A comprehensive Streamlit application for analyzing the financial impact of diff
 
 ## 🔐 Access
 
-**Password:** `hackathon2025`
+**Password:** `Us3!t4g00d`
 
 ## 🚀 Features
 
@@ -87,7 +87,7 @@ For production use:
 
 ## 📱 Usage
 
-1. **Enter Password**: Use `hackathon2025` to access the app
+1. **Enter Password**: Use `Us3!t4g00d` to access the app
 2. **Load Scenarios**: Choose from predefined scenarios or create custom ones
 3. **Adjust Parameters**: Modify lines, pricing, data caps, and business types
 4. **View Results**: Switch between Customer View, Financial View, and SCO Analysis
