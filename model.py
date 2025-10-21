@@ -142,7 +142,7 @@ def optimize_sco_parameters(students, current_cap, budget, carrier_rate, current
         dict: Optimization results containing:
             - recommended_base_plan_gb (float): Optimal base plan size (SCO only)
             - recommended_sco_efficiency (float): Optimal SCO efficiency (SCO only)
-            - recommended_overage_rate (float): Optimal overage rate (SCO only)
+            - recommended_overage_rate (float): Fixed overage rate (not optimized - business constraint)
             - recommended_plan_switching_cost (float): Optimal switching cost (SCO only)
             - recommended_monthly_usage_per_line (float): Optimal usage pattern
             - recommended_throttling (bool): Optimal throttling setting
@@ -171,10 +171,8 @@ def optimize_sco_parameters(students, current_cap, budget, carrier_rate, current
         # SCO efficiency: 0.6 to 0.95, in 0.05 increments
         sco_efficiency_values = [round(0.6 + i * 0.05, 2) for i in range(8)]  # 0.6, 0.65, ..., 0.95
         
-        # Overage rates: ±30% of current, in $2 increments
-        overage_min = max(5.0, current_overage_rate * 0.7)
-        overage_max = min(25.0, current_overage_rate * 1.3)
-        overage_step = 2.0
+        # Overage rate: Fixed business constraint (not optimized)
+        # Use current overage rate as fixed parameter
         
         # Plan switching costs: ±50% of current, in $0.25 increments
         switching_min = max(0.25, current_plan_switching_cost * 0.5)
@@ -188,31 +186,29 @@ def optimize_sco_parameters(students, current_cap, budget, carrier_rate, current
         
         # Generate search space
         base_plans = [round(base_plan_min + i * base_plan_step, 1) for i in range(int((base_plan_max - base_plan_min) / base_plan_step) + 1)]
-        overage_rates = [round(overage_min + i * overage_step, 1) for i in range(int((overage_max - overage_min) / overage_step) + 1)]
         switching_costs = [round(switching_min + i * switching_step, 2) for i in range(int((switching_max - switching_min) / switching_step) + 1)]
         usage_patterns = [round(usage_min + i * usage_step, 2) for i in range(int((usage_max - usage_min) / usage_step) + 1)]
         
         # Limit search space to reasonable size (max 200 combinations)
-        if len(base_plans) * len(sco_efficiency_values) * len(overage_rates) * len(switching_costs) * len(usage_patterns) > 200:
+        if len(base_plans) * len(sco_efficiency_values) * len(switching_costs) * len(usage_patterns) > 200:
             # Sample more intelligently
             base_plans = [round(base_plan_min + i * (base_plan_max - base_plan_min) / 4, 1) for i in range(5)]
-            overage_rates = [round(overage_min + i * (overage_max - overage_min) / 4, 1) for i in range(5)]
             switching_costs = [round(switching_min + i * (switching_max - switching_min) / 4, 2) for i in range(5)]
             usage_patterns = [round(usage_min + i * (usage_max - usage_min) / 4, 2) for i in range(5)]
         
         # Search over SCO parameter combinations
         for base_plan_gb in base_plans:
             for sco_efficiency in sco_efficiency_values:
-                for overage_rate in overage_rates:
-                    for plan_switching_cost in switching_costs:
-                        for monthly_usage_per_line in usage_patterns:
-                            # Calculate metrics for this SCO combination
-                            metrics = calculate_sco_metrics(
-                                students, base_plan_gb, current_cap, budget, carrier_rate, 
-                                current_customer_price, policy, throttling, sco_enabled=True,
-                                sco_efficiency=sco_efficiency, overage_rate=overage_rate, 
-                                plan_switching_cost=plan_switching_cost, monthly_usage_per_line=monthly_usage_per_line
-                            )
+                for plan_switching_cost in switching_costs:
+                    for monthly_usage_per_line in usage_patterns:
+                        # Calculate metrics for this SCO combination
+                        # Use fixed overage rate (business constraint)
+                        metrics = calculate_sco_metrics(
+                            students, base_plan_gb, current_cap, budget, carrier_rate, 
+                            current_customer_price, policy, throttling, sco_enabled=True,
+                            sco_efficiency=sco_efficiency, overage_rate=current_overage_rate, 
+                            plan_switching_cost=plan_switching_cost, monthly_usage_per_line=monthly_usage_per_line
+                        )
                             
                             # Check constraints
                             budget_constraint = metrics['revenue'] <= budget
@@ -223,7 +219,7 @@ def optimize_sco_parameters(students, current_cap, budget, carrier_rate, current
                             solution = {
                                 'base_plan_gb': base_plan_gb,
                                 'sco_efficiency': sco_efficiency,
-                                'overage_rate': overage_rate,
+                                'overage_rate': current_overage_rate,  # Fixed business constraint
                                 'plan_switching_cost': plan_switching_cost,
                                 'monthly_usage_per_line': monthly_usage_per_line,
                                 'throttling': throttling,  # Keep current throttling
