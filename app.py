@@ -320,14 +320,6 @@ def display_help_guide():
         - **Requirements**: Ollama for full AI features, templates as fallback
         - **Best For**: Strategic planning, risk assessment, competitive analysis
         
-        ### Excel View - "Traditional spreadsheet model" (NEW!)
-        - **Purpose**: Show basic Excel-style analysis for comparison
-        - **Features**: 
-          - **Basic Financial Model**: Simple parameter table with formulas
-          - **Basic Charts**: Traditional bar and pie charts
-          - **Scenario Comparison**: Simple side-by-side comparison
-          - **Limitations Highlight**: Shows what traditional models miss
-        - **Best For**: Demonstrating the difference between basic and advanced solutions
         
         ### Historical Analysis - "Advanced data visualization"
         - **Purpose**: Analyze trends and export data
@@ -486,13 +478,12 @@ def display_help_guide():
         
         ### For Demos:
         1. Start with "SCO-Enabled Enterprise" scenario
-        2. Show Excel View first (basic spreadsheet model)
-        3. Switch to Customer View (unlimited experience)
-        4. Switch to Financial View (current performance with SCO)
-        5. Demonstrate SCO Analysis tab (SCO impact and benefits)
-        6. Run "Find Optimal Pricing" to get optimization results
-        7. Show AI Insights (trend analysis)
-        8. Compare with "Enterprise Baseline (No SCO)" scenario
+        2. Switch to Customer View (unlimited experience)
+        3. Switch to Financial View (current performance with SCO)
+        4. Demonstrate SCO Analysis tab (SCO impact and benefits)
+        5. Run "Find Optimal Pricing" to get optimization results
+        6. Show AI Insights (trend analysis)
+        7. Compare with "Enterprise Baseline (No SCO)" scenario
         
         ### Tab Workflow - Understanding the Relationship:
         **Step 1: Financial View** - See current scenario performance
@@ -519,7 +510,7 @@ def display_help_guide():
         - **Sales Teams**: Use SCO Analysis for competitive differentiation
         - **Analysts**: Use Historical Analysis and AI Insights
         - **Operations**: Show optimization and scenario management
-        - **Decision Makers**: Start with Excel View, then show advanced features
+        - **Decision Makers**: Start with Customer View, then show advanced features
         
         ## 🔧 Troubleshooting
         
@@ -949,7 +940,7 @@ def main():
         st.success("🎯 **Optimization Complete!** Check the **Financial View** tab below to see the results and comparison charts.")
     
     # Main content area with dual-audience design using native tabs
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📱 Customer View", "💰 Financial View", "🎯 SCO Analysis", "🤖 AI Insights", "📊 Excel View", "📊 Historical Analysis"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📱 Customer View", "💰 Financial View", "🎯 SCO Analysis", "🤖 AI Insights", "📊 Historical Analysis"])
     
     with tab1:
         st.header("📱 Customer View")
@@ -1828,306 +1819,8 @@ def main():
         else:
             st.warning("⚠️ Insufficient historical data for AI analysis. Need at least 3 data points.")
             st.info("💡 Load more scenarios or use the Historical Analysis tab to generate synthetic data.")
-    with tab5:
-        st.header("📊 Traditional Excel Model View")
-        st.markdown("### Basic spreadsheet-style analysis (for comparison)")
-        
-        # Excel-style layout with basic calculations
-        st.markdown("---")
-        st.subheader("📋 Basic Financial Model")
-        
-        # Create Excel-like table structure
-        if sco_enabled:
-            # SCO-enabled Excel view with additional SCO metrics
-            excel_data = {
-                'Parameter': [
-                    'Number of Lines',
-                    'Customer Data Cap per Line (GB)',
-                    'Base Plan per Line (GB)',
-                    'Total Data Capacity (GB)',
-                    'Budget ($)',
-                    'Carrier Rate ($/GB)',
-                    'Overage Rate ($/GB)',
-                    'Monthly Price per Line ($)',
-                    'Vertical Factor',
-                    'Efficiency Factor',
-                    'SCO Efficiency (%)',
-                    'Total Usage (GB)',
-                    'Base Plan Usage (GB)',
-                    'Potential Overage (GB)',
-                    'Actual Overage (GB)',
-                    'Overage Savings (GB)',
-                    'Base Plan Cost ($)',
-                    'Overage Cost ($)',
-                    'Plan Switching Cost ($)',
-                    'SCO Operational Cost ($)',
-                    'Total Carrier Cost ($)',
-                    'Revenue ($)',
-                    'Margin ($)',
-                    'Margin (%)',
-                    'Coverage (%)',
-                    'Budget Utilization (%)',
-                    'Budget Remaining ($)',
-                    'SCO ROI'
-                ],
-                'Value': [
-                    f"{students:,}",
-                    f"{cap:.1f}",
-                    f"{base_plan_gb:.1f}",
-                    f"{students * cap:,.1f}",
-                    f"${budget:,.2f}",
-                    f"${carrier_rate:.2f}",
-                    f"${overage_rate:.2f}",
-                    f"${customer_price:.2f}",
-                    f"{metrics.get('policy_factor', 1.0):.1f}",
-                    f"{metrics.get('efficiency_factor', 1.0):.1f}",
-                    f"{st.session_state.sco_efficiency:.1%}",
-                    f"{metrics['usage']:,.1f}",
-                    f"{metrics.get('base_usage', 0):,.1f}",
-                    f"{metrics.get('potential_overage', 0):,.1f}",
-                    f"{metrics.get('actual_overage', 0):,.1f}",
-                    f"{metrics.get('overage_savings', 0):,.1f}",
-                    f"${metrics.get('base_carrier_cost', 0):,.2f}",
-                    f"${metrics.get('overage_carrier_cost', 0):,.2f}",
-                    f"${metrics.get('switching_cost', 0):,.2f}",
-                    f"${metrics.get('sco_operational_cost', 0):,.2f}",
-                    f"${metrics['carrier_cost']:,.2f}",
-                    f"${metrics['revenue']:,.2f}",
-                    f"${metrics['revenue'] - metrics['carrier_cost']:,.2f}",
-                    f"{metrics['margin']:.1%}",
-                    f"{metrics['coverage']:.1f}%",
-                    f"{metrics.get('budget_utilization', 0):.1f}%",
-                    f"${metrics.get('budget_remaining', 0):,.2f}",
-                    f"{metrics.get('sco_savings', {}).get('roi', 0):.1f}x"
-                ],
-                'Formula': [
-                    "Input (Total lines in service)",
-                    "Input (What customer sees)", 
-                    "Input (Internal base plan size)",
-                    "Lines × Customer Data Cap per Line",
-                    "Input (Total budget available)",
-                    "Input (Cost per GB from carrier)",
-                    "Input (Overage charge rate)",
-                    "Input (Fixed monthly fee per line)",
-                    "Policy Factor (Public Sector: 1.2, Retail: 1.0, Enterprise: 1.1)",
-                    "Efficiency Factor (Throttling ON: 0.8, OFF: 1.0)",
-                    "Input (SCO efficiency setting)",
-                    "Lines × Monthly Usage per Line × Policy Factor × Efficiency Factor",
-                    "Lines × Base Plan GB",
-                    "Total Usage - Base Usage",
-                    "Potential Overage × (1 - SCO Efficiency)",
-                    "Potential Overage - Actual Overage",
-                    "Base Usage × Carrier Rate",
-                    "Actual Overage × Overage Rate",
-                    "Lines × Plan Switching Cost",
-                    "Lines × SCO Operational Cost per Line",
-                    "Base Cost + Overage Cost + Switching Cost + SCO Operational Cost",
-                    "min(Budget, Lines × Monthly Price per Line)",
-                    "Revenue - Total Carrier Cost",
-                    "(Revenue - Total Carrier Cost) / Revenue",
-                    "Revenue / (Lines × Monthly Price per Line) × 100",
-                    "Revenue / Budget × 100",
-                    "Budget - Revenue",
-                    "SCO Savings / SCO Costs"
-                ]
-            }
-        else:
-            # Standard Excel view without SCO metrics
-            excel_data = {
-                'Parameter': [
-                    'Number of Lines',
-                    'Data Cap per Line (GB)',
-                    'Total Data Capacity (GB)',
-                    'Budget ($)',
-                    'Carrier Rate ($/GB)',
-                    'Monthly Price per Line ($)',
-                    'Vertical Factor',
-                    'Efficiency Factor',
-                    'Actual Usage (GB)',
-                    'Carrier Cost ($)',
-                    'Revenue ($)',
-                    'Margin ($)',
-                    'Margin (%)',
-                    'Coverage (%)',
-                    'Budget Utilization (%)',
-                    'Budget Remaining ($)'
-                ],
-                'Value': [
-                    f"{students:,}",
-                    f"{cap:.1f}",
-                    f"{students * cap:,.1f}",
-                    f"${budget:,.2f}",
-                    f"${carrier_rate:.2f}",
-                    f"${customer_price:.2f}",
-                    f"{metrics.get('policy_factor', 1.0):.1f}",
-                    f"{metrics.get('efficiency_factor', 1.0):.1f}",
-                    f"{metrics['usage']:,.1f}",
-                    f"${metrics['carrier_cost']:,.2f}",
-                    f"${metrics['revenue']:,.2f}",
-                    f"${metrics['revenue'] - metrics['carrier_cost']:,.2f}",
-                    f"{metrics['margin']:.1%}",
-                    f"{metrics['coverage']:.1f}%",
-                    f"{metrics.get('budget_utilization', 0):.1f}%",
-                    f"${metrics.get('budget_remaining', 0):,.2f}"
-                ],
-                'Formula': [
-                    "Input (Total lines in service)",
-                    "Input (GB allowance per line)", 
-                    "Lines × Data Cap per Line",
-                    "Input (Total budget available)",
-                    "Input (Cost per GB from carrier)",
-                    "Input (Fixed monthly fee per line)",
-                    "Policy Factor (Public Sector: 1.2, Retail: 1.0, Enterprise: 1.1)",
-                    "Efficiency Factor (Throttling ON: 0.8, OFF: 1.0)",
-                    "Lines × Monthly Usage per Line × Policy Factor × Efficiency Factor",
-                    "Actual Usage × Carrier Rate",
-                    "min(Budget, Lines × Monthly Price per Line)",
-                    "Revenue - Carrier Cost",
-                    "(Revenue - Carrier Cost) / Revenue",
-                    "Revenue / (Lines × Monthly Price per Line) × 100",
-                    "Revenue / Budget × 100",
-                    "Budget - Revenue"
-                ]
-            }
-        
-        excel_df = pd.DataFrame(excel_data)
-        st.dataframe(excel_df, use_container_width=True, hide_index=True)
-        
-        # Detailed formula explanations
-        st.markdown("---")
-        st.subheader("🧮 Formula Explanations")
-        
-        with st.expander("📖 Click to view detailed formula explanations", expanded=False):
-            st.markdown("""
-            **Key Calculation Formulas:**
-            
-            **1. Actual Usage Calculation:**
-            ```
-            Actual Usage = Lines × Monthly Usage per Line × Policy Factor × Efficiency Factor
-            ```
-            - **Monthly Usage per Line**: Typically 2.5 GB (realistic consumption)
-            - **Policy Factor**: Public Sector (1.2), Retail (1.0), Enterprise (1.1)
-            - **Efficiency Factor**: Throttling ON (0.8), OFF (1.0)
-            
-            **2. Carrier Cost:**
-            ```
-            Carrier Cost = Actual Usage × Carrier Rate
-            ```
-            - This represents what you pay the carrier for data consumption
-            
-            **3. Revenue (New Per-Line Model):**
-            ```
-        Revenue = min(Budget, Lines × Monthly Price per Line)
-        ```
-        - **Customer's budget limits** how much they can pay
-        - If total monthly fees exceed budget, revenue is capped at budget
-            
-            **4. Margin Calculation:**
-            ```
-            Margin = (Revenue - Carrier Cost) / Revenue
-            ```
-            - Positive margin = profitable, Negative margin = loss
-            
-            **5. Coverage Percentage:**
-            ```
-            Coverage = Revenue / (Lines × Monthly Price per Line) × 100
-            ```
-            - 100% = full capacity, <100% = budget constraints limiting service reach
-            
-            **6. Budget Utilization:**
-            ```
-            Budget Utilization = (Revenue / Budget) × 100
-            ```
-            - Shows how much of the customer's budget is being used
-            - 100% = customer's budget fully utilized, >100% = over budget
-            
-            **7. Budget Remaining:**
-            ```
-            Budget Remaining = Budget - Revenue
-            ```
-            - Shows how much of the customer's budget is left unused
-            
-            **Business Model:** Customer has a budget limit that constrains how much they can pay monthly.
-            """)
-        
-        # Basic charts (Excel-style)
-        st.markdown("---")
-        st.subheader("📈 Basic Charts")
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            # Simple bar chart
-            st.markdown("**Cost vs Revenue**")
-            fig, ax = plt.subplots(figsize=(8, 5))
-            categories = ['Carrier Cost', 'Revenue']
-            values = [metrics['carrier_cost'], metrics['revenue']]
-            colors = ['#ff6b6b', '#4ecdc4']
-            
-            bars = ax.bar(categories, values, color=colors, alpha=0.7)
-            ax.set_ylabel('Amount ($)')
-            ax.set_title('Basic Financial Overview')
-            ax.grid(True, alpha=0.3)
-            
-            # Add value labels on bars
-            for bar, value in zip(bars, values):
-                height = bar.get_height()
-                ax.text(bar.get_x() + bar.get_width()/2., height + height*0.01,
-                       f'${value:,.0f}', ha='center', va='bottom')
-            
-            plt.tight_layout()
-            st.pyplot(fig)
-        
-        with col2:
-            # Simple pie chart
-            st.markdown("**Coverage Distribution**")
-            fig, ax = plt.subplots(figsize=(8, 5))
-            covered = metrics['coverage']
-            uncovered = 100 - covered
-            
-            sizes = [covered, uncovered]
-            labels = ['Covered Lines', 'Uncovered Lines']
-            colors = ['#4ecdc4', '#ff6b6b']
-            
-            wedges, texts, autotexts = ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
-            ax.set_title('Line Coverage')
-            
-            plt.tight_layout()
-            st.pyplot(fig)
-        
-        # Limitations section
-        st.markdown("---")
-        st.subheader("⚠️ Traditional Excel Model Limitations")
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.markdown("**What's Missing:**")
-            st.write("❌ No SCO analysis")
-            st.write("❌ No AI-powered insights")
-            st.write("❌ No optimization engine")
-            st.write("❌ No dual-audience views")
-            st.write("❌ No forecasting capabilities")
-            st.write("❌ No interactive scenario management")
-            st.write("❌ No real-time calculations")
-            st.write("❌ No advanced visualizations")
-        
-        with col2:
-            st.markdown("**What You Get with Our Solution:**")
-            st.write("✅ SCO cost optimization")
-            st.write("✅ AI narratives and forecasting")
-            st.write("✅ Automated optimization")
-            st.write("✅ Customer vs Financial views")
-            st.write("✅ Predictive analytics")
-            st.write("✅ Interactive scenario comparison")
-            st.write("✅ Real-time parameter adjustment")
-            st.write("✅ Professional visualizations")
-        
-        # Call to action
-        st.markdown("---")
-        st.success("🚀 **Ready to see the difference?** Switch to other tabs to experience advanced features like SCO analysis, AI insights, and optimization!")
     
-    with tab6:
+    with tab5:
         st.header("📊 Historical Data Analysis")
         st.markdown("### Advanced data visualization and trend analysis")
         
