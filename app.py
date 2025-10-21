@@ -402,7 +402,7 @@ def display_help_guide():
         - **Alternatives**: Top 5 alternative solutions
         
         ### Optimization Features:
-        - **Pricing & Data Cap Optimization** (Financial View): Uses AI to find optimal pricing and data caps with comprehensive comparison charts and analysis
+        - **Smart Parameter Optimization** (Financial View): Uses AI to find optimal SCO parameters or service settings with comprehensive comparison charts and analysis
         
         ## 📐 Calculation Formulas
         
@@ -863,9 +863,12 @@ def main():
     
     # Optimization section
     st.sidebar.markdown("---")
-    st.sidebar.subheader("🎯 Pricing & Data Cap Optimization")
+    st.sidebar.subheader("🎯 Smart Parameter Optimization")
     
-    st.sidebar.markdown("**Optimize your pricing and data caps for better margins:**")
+    if sco_enabled:
+        st.sidebar.markdown("**Optimize SCO parameters for better margins:**")
+    else:
+        st.sidebar.markdown("**Optimize service parameters for better margins:**")
     
     # Initialize optimization settings in session state
     if 'min_coverage' not in st.session_state:
@@ -1343,9 +1346,12 @@ def main():
         
         # Optimization section within Financial View
         st.markdown("---")
-        st.subheader("🎯 Pricing & Data Cap Optimization")
+        st.subheader("🎯 Smart Parameter Optimization")
         
-        st.markdown("**Find optimal pricing and data caps for maximum profitability:**")
+        if sco_enabled:
+            st.markdown("**Find optimal SCO parameters for maximum profitability:**")
+        else:
+            st.markdown("**Find optimal service parameters for maximum profitability:**")
         
         if 'optimization_result' in st.session_state:
             result = st.session_state.optimization_result
