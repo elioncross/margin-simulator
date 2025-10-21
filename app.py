@@ -21,7 +21,7 @@ from ai_insights import generate_trend_analysis, generate_forecasting_insights, 
 def safe_rerun():
     """Compatibility wrapper for st.rerun() and st.experimental_rerun()"""
     try:
-        safe_rerun()
+        st.rerun()
     except AttributeError:
         st.experimental_rerun()
 
