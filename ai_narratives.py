@@ -419,8 +419,15 @@ Focus on practical recommendations for adjusting constraints to find viable solu
 Keep it under 100 words and be solution-oriented.
 IMPORTANT: Write as a single paragraph without line breaks or bullet points."""
     else:
-        recommended_price = optimization_result['recommended_customer_price']
-        recommended_cap = optimization_result['recommended_cap']
+        # Get optimization results - handle both old and new optimization formats
+        if 'recommended_customer_price' in optimization_result:
+            # Old optimization format
+            recommended_price = optimization_result['recommended_customer_price']
+            recommended_cap = optimization_result['recommended_cap']
+        else:
+            # New optimization format - use current values since pricing/caps are fixed
+            recommended_price = current_metrics.get('revenue', 0) / current_metrics.get('students', 1) if current_metrics.get('students', 0) > 0 else 0
+            recommended_cap = current_metrics.get('cap', 0)
         opt_metrics = optimization_result['metrics']
         improvement = optimization_result['improvement']
         margin_improvement = improvement['margin_improvement']
@@ -511,8 +518,15 @@ Focus on practical recommendations for adjusting constraints to find viable solu
 Keep it under 100 words and be solution-oriented.
 IMPORTANT: Write as a single paragraph without line breaks or bullet points."""
     else:
-        recommended_price = optimization_result['recommended_customer_price']
-        recommended_cap = optimization_result['recommended_cap']
+        # Get optimization results - handle both old and new optimization formats
+        if 'recommended_customer_price' in optimization_result:
+            # Old optimization format
+            recommended_price = optimization_result['recommended_customer_price']
+            recommended_cap = optimization_result['recommended_cap']
+        else:
+            # New optimization format - use current values since pricing/caps are fixed
+            recommended_price = current_metrics.get('revenue', 0) / current_metrics.get('students', 1) if current_metrics.get('students', 0) > 0 else 0
+            recommended_cap = current_metrics.get('cap', 0)
         opt_metrics = optimization_result['metrics']
         improvement = optimization_result['improvement']
         margin_improvement = improvement['margin_improvement']
