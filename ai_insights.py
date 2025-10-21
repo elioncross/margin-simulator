@@ -470,12 +470,15 @@ def _generate_ollama_forecast_insights(forecasts: Dict[str, Any], historical_dat
     coverage_trend = forecasts.get('coverage', {}).get('trend', 'unknown')
     revenue_trend = forecasts.get('revenue', {}).get('trend', 'unknown')
     
+    # Get forecast periods from the forecasts data
+    forecast_periods = len(forecasts.get('margin', {}).get('values', []))
+    
     avg_historical_margin = historical_data['margin'].mean()
     avg_historical_coverage = historical_data['coverage'].mean()
     
     prompt = f"""As a senior business analyst, provide strategic forecasting insights for this connectivity service:
 
-Forecast Trends (next 6 periods):
+Forecast Trends (next {forecast_periods} periods):
 - Margin trend: {margin_trend}
 - Coverage trend: {coverage_trend}
 - Revenue trend: {revenue_trend}
@@ -554,12 +557,15 @@ def _generate_google_ai_forecast_insights(forecasts: Dict[str, Any], historical_
     coverage_trend = forecasts.get('coverage', {}).get('trend', 'unknown')
     revenue_trend = forecasts.get('revenue', {}).get('trend', 'unknown')
     
+    # Get forecast periods from the forecasts data
+    forecast_periods = len(forecasts.get('margin', {}).get('values', []))
+    
     avg_historical_margin = historical_data['margin'].mean()
     avg_historical_coverage = historical_data['coverage'].mean()
     
     prompt = f"""As a senior business analyst, provide strategic forecasting insights for this connectivity service:
 
-Forecast Trends (next 6 periods):
+Forecast Trends (next {forecast_periods} periods):
 - Margin trend: {margin_trend}
 - Coverage trend: {coverage_trend}
 - Revenue trend: {revenue_trend}
@@ -641,7 +647,8 @@ def _generate_template_forecast_insights(forecasts: Dict[str, Any], historical_d
         outlook = "mixed"
         emoji = "📊"
     
-    narrative = f"{emoji} **Forecast Outlook:** The {outlook} forecast indicates {margin_trend} margin trends and {coverage_trend} coverage patterns over the next 6 periods. Based on {len(historical_data)} historical data points, strategic adjustments may be needed to optimize performance and maintain competitive positioning in the connectivity market."
+    forecast_periods = len(forecasts.get('margin', {}).get('values', []))
+    narrative = f"{emoji} **Forecast Outlook:** The {outlook} forecast indicates {margin_trend} margin trends and {coverage_trend} coverage patterns over the next {forecast_periods} periods. Based on {len(historical_data)} historical data points, strategic adjustments may be needed to optimize performance and maintain competitive positioning in the connectivity market."
     
     return _clean_ai_text(narrative)
 
@@ -654,7 +661,8 @@ def create_forecast_chart(forecasts: Dict[str, Any], historical_data: pd.DataFra
     # Historical periods
     hist_periods = range(len(historical_data))
     # Future periods
-    future_periods = range(len(historical_data), len(historical_data) + forecasts.get('forecast_periods', 6))
+    forecast_periods = forecasts.get('forecast_periods', 6)
+    future_periods = range(len(historical_data), len(historical_data) + forecast_periods)
     
     # Plot 1: Margin Forecast
     ax1 = axes[0, 0]
