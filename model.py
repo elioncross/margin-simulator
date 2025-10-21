@@ -209,29 +209,29 @@ def optimize_sco_parameters(students, current_cap, budget, carrier_rate, current
                             sco_efficiency=sco_efficiency, overage_rate=current_overage_rate, 
                             plan_switching_cost=plan_switching_cost, monthly_usage_per_line=monthly_usage_per_line
                         )
-                            
-                            # Check constraints
-                            budget_constraint = metrics['revenue'] <= budget
-                            coverage_constraint = metrics['coverage'] >= min_coverage
-                            margin_constraint = metrics['margin'] >= min_margin
-                            
-                            # Store solution for analysis
-                            solution = {
-                                'base_plan_gb': base_plan_gb,
-                                'sco_efficiency': sco_efficiency,
-                                'overage_rate': current_overage_rate,  # Fixed business constraint
-                                'plan_switching_cost': plan_switching_cost,
-                                'monthly_usage_per_line': monthly_usage_per_line,
-                                'throttling': throttling,  # Keep current throttling
-                                'metrics': metrics,
-                                'feasible': budget_constraint and coverage_constraint and margin_constraint
-                            }
-                            all_solutions.append(solution)
-                            
-                            # Update best solution if constraints are met and margin is better
-                            if solution['feasible'] and metrics['margin'] > best_margin:
-                                best_margin = metrics['margin']
-                                best_solution = solution
+                        
+                        # Check constraints
+                        budget_constraint = metrics['revenue'] <= budget
+                        coverage_constraint = metrics['coverage'] >= min_coverage
+                        margin_constraint = metrics['margin'] >= min_margin
+                        
+                        # Store solution for analysis
+                        solution = {
+                            'base_plan_gb': base_plan_gb,
+                            'sco_efficiency': sco_efficiency,
+                            'overage_rate': current_overage_rate,  # Fixed business constraint
+                            'plan_switching_cost': plan_switching_cost,
+                            'monthly_usage_per_line': monthly_usage_per_line,
+                            'throttling': throttling,  # Keep current throttling
+                            'metrics': metrics,
+                            'feasible': budget_constraint and coverage_constraint and margin_constraint
+                        }
+                        all_solutions.append(solution)
+                        
+                        # Update best solution if constraints are met and margin is better
+                        if solution['feasible'] and metrics['margin'] > best_margin:
+                            best_margin = metrics['margin']
+                            best_solution = solution
     else:
         # Non-SCO optimization: Focus on service parameters
         # Usage patterns: ±30% of current, in 0.25GB increments
