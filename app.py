@@ -12,7 +12,7 @@ import seaborn as sns
 import json
 import io
 from datetime import datetime
-from model import calculate_metrics, optimize_pricing_and_caps, calculate_sco_metrics, compare_sco_vs_traditional
+from model import calculate_metrics, optimize_sco_parameters, calculate_sco_metrics, compare_sco_vs_traditional
 from scenarios import get_scenario, get_all_scenarios
 from ai_narratives import generate_ai_narrative, generate_optimization_narrative, get_ai_narrative_status
 from ai_insights import generate_trend_analysis, generate_forecasting_insights, create_forecast_chart, get_ai_insights_status
@@ -472,7 +472,7 @@ def display_help_guide():
         ### Key Differentiators (vs. Excel models):
         - **Dual-Audience Views**: Customer vs. Financial perspectives
         - **SCO Analysis**: Smart Cost Optimization comparison and ROI analysis
-        - **Optimization Engine**: AI-powered recommendations under constraints
+        - **Smart Parameter Optimization**: SCO parameter tuning and service optimization
         - **AI Insights**: Forecasting, correlations, advanced analytics
         - **Export & Scenario Management**: Professional polish and data portability
         
@@ -481,7 +481,7 @@ def display_help_guide():
         2. Switch to Customer View (unlimited experience)
         3. Switch to Financial View (current performance with SCO)
         4. Demonstrate SCO Analysis tab (SCO impact and benefits)
-        5. Run "Find Optimal Pricing" to get optimization results
+        5. Run "Find Optimal Parameters" to get SCO/service parameter recommendations
         6. Show AI Insights (trend analysis)
         7. Compare with "Enterprise Baseline (No SCO)" scenario
         
@@ -897,20 +897,23 @@ def main():
     st.session_state.min_coverage = min_coverage
     st.session_state.min_margin = min_margin
     
-    if st.sidebar.button("🚀 Find Optimal Pricing", type="primary"):
-        with st.spinner("🔍 Analyzing pricing and data cap combinations..."):
-            optimization_result = optimize_pricing_and_caps(
+    if st.sidebar.button("🚀 Find Optimal Parameters", type="primary"):
+        with st.spinner("🔍 Analyzing SCO parameters and service settings..."):
+            optimization_result = optimize_sco_parameters(
                 students, cap, budget, carrier_rate, 
                 customer_price, policy, throttling, min_coverage, min_margin/100,
-                sco_enabled=sco_enabled, base_plan_gb=base_plan_gb, 
-                sco_efficiency=sco_efficiency, overage_rate=overage_rate, 
-                plan_switching_cost=plan_switching_cost, monthly_usage_per_line=monthly_usage_per_line
+                sco_enabled=sco_enabled, current_base_plan_gb=base_plan_gb, 
+                current_sco_efficiency=sco_efficiency, current_overage_rate=overage_rate, 
+                current_plan_switching_cost=plan_switching_cost, current_monthly_usage_per_line=monthly_usage_per_line
             )
             st.session_state.optimization_result = optimization_result
             # Set flag to show completion notification
             st.session_state.optimization_completed = True
             if optimization_result['feasible']:
-                st.sidebar.success("✅ Optimal pricing found! Check the Financial View tab for results.")
+                if sco_enabled:
+                    st.sidebar.success("✅ Optimal SCO parameters found! Check the Financial View tab for results.")
+                else:
+                    st.sidebar.success("✅ Optimal service parameters found! Check the Financial View tab for results.")
             else:
                 st.sidebar.error("❌ No feasible solution found. Try relaxing constraints.")
             # Force rerun to show notification
@@ -1415,8 +1418,13 @@ def main():
                 
                 with col_b:
                     st.markdown("**Optimized Configuration:**")
-                    st.write(f"Monthly Price per Line: ${result['recommended_customer_price']:.2f}")
-                    st.write(f"Data Cap: {result['recommended_cap']:.1f} GB")
+                    if sco_enabled:
+                        st.write(f"Base Plan: {result['recommended_base_plan_gb']:.1f} GB")
+                        st.write(f"SCO Efficiency: {result['recommended_sco_efficiency']:.1%}")
+                        st.write(f"Overage Rate: ${result['recommended_overage_rate']:.1f}/GB")
+                        st.write(f"Switching Cost: ${result['recommended_plan_switching_cost']:.2f}/line")
+                    st.write(f"Usage Pattern: {result['recommended_monthly_usage_per_line']:.1f} GB/line")
+                    st.write(f"Throttling: {'ON' if result['recommended_throttling'] else 'OFF'}")
                     st.write(f"Margin: {opt_metrics['margin']:.1%}")
                     st.write(f"Coverage: {opt_metrics['coverage']:.1f}%")
                     st.write(f"Revenue: ${opt_metrics['revenue']:,.0f}")
@@ -1440,19 +1448,36 @@ def main():
                 st.pyplot(create_optimization_comparison_chart(metrics, opt_metrics))
                 
                 # Apply button
-                if st.button("✅ Apply Optimal Pricing", type="primary", key="apply_optimal_pricing"):
+                if st.button("✅ Apply Optimal Parameters", type="primary", key="apply_optimal_parameters"):
                     # Update session state with optimized values
-                    current_scenario = st.session_state.current_scenario.copy()
-                    current_scenario['customer_price'] = result['recommended_customer_price']
-                    current_scenario['cap'] = result['recommended_cap']
-                    st.session_state.current_scenario = current_scenario
+                    if sco_enabled:
+                        # Update SCO parameters
+                        st.session_state.base_plan_gb = result['recommended_base_plan_gb']
+                        st.session_state.sco_efficiency = result['recommended_sco_efficiency']
+                        st.session_state.overage_rate = result['recommended_overage_rate']
+                        st.session_state.plan_switching_cost = result['recommended_plan_switching_cost']
+                    
+                    # Update service parameters
+                    st.session_state.monthly_usage_per_line = result['recommended_monthly_usage_per_line']
+                    st.session_state.throttling = result['recommended_throttling']
+                    
+                    # Clear optimization results to prevent re-application
+                    if 'optimization_result' in st.session_state:
+                        del st.session_state.optimization_result
+                    if 'optimization_completed' in st.session_state:
+                        del st.session_state.optimization_completed
+                    
+                    st.success("✅ Optimal parameters applied! The scenario has been updated.")
                     # Trigger rerun to update the UI
                     safe_rerun()
             else:
                 st.error("❌ " + result['message'])
                 st.info("💡 Try relaxing your minimum coverage or margin requirements")
         else:
-            st.info("👆 **Click 'Find Optimal Pricing' in the sidebar to get pricing recommendations**")
+            if sco_enabled:
+                st.info("👆 **Click 'Find Optimal Parameters' in the sidebar to get SCO parameter recommendations**")
+            else:
+                st.info("👆 **Click 'Find Optimal Parameters' in the sidebar to get service parameter recommendations**")
         
         # Optimization Settings (moved to bottom for better layout)
         st.markdown("---")
