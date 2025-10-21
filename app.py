@@ -404,6 +404,24 @@ def display_help_guide():
         ### Optimization Features:
         - **Smart Parameter Optimization** (Financial View): Uses AI to find optimal SCO parameters or service settings with comprehensive comparison charts and analysis
         
+        ### 🎯 Optimization Constraints Guide:
+        
+        **Minimum Coverage (%)**: How much of your potential revenue you want to capture
+        - **60-70%**: Conservative approach, good for testing
+        - **80-90%**: Aggressive growth, higher risk
+        - **50%**: Very conservative, easy to achieve
+        
+        **Minimum Margin (%)**: Target profitability level
+        - **5-10%**: Basic profitability target
+        - **15-20%**: Strong profitability
+        - **0%**: Break-even point (minimum viable)
+        
+        **💡 Pro Tips for Optimization:**
+        - Start with **60% coverage, 5% margin** for easy wins
+        - Use **70% coverage, 10% margin** for balanced approach
+        - Try **80% coverage, 15% margin** for aggressive targets
+        - If optimization fails, lower constraints and try again
+        
         ## 📐 Calculation Formulas
         
         **Usage Calculation:**
@@ -484,6 +502,17 @@ def display_help_guide():
         5. Run "Find Optimal Parameters" to get SCO/service parameter recommendations
         6. Show AI Insights (trend analysis)
         7. Compare with "Enterprise Baseline (No SCO)" scenario
+        
+        ### 🎯 Optimization Demo - Transform Loss to Profit:
+        1. **Load Unprofitable Scenario**: Select "Unprofitable Example (Optimizable)" from dropdown
+        2. **Check Financial View**: Notice negative margin (-X.X%)
+        3. **Set Optimization Constraints**: 
+           - Minimum Coverage: 60-70% (reasonable coverage requirement)
+           - Minimum Margin: 5-10% (target profitability)
+        4. **Run Optimization**: Click "Find Optimal Parameters" in sidebar
+        5. **Apply Results**: Click "Apply Optimal Parameters" in Financial View
+        6. **See Transformation**: Notice margin becomes positive (+X.X%)
+        7. **Compare Results**: Use sidebar controls to revert and compare
         
         ### Tab Workflow - Understanding the Relationship:
         **Step 1: Financial View** - See current scenario performance
@@ -1221,6 +1250,17 @@ def main():
         if st.session_state.get('viewing_optimized_scenario', False):
             original_name = st.session_state.current_scenario.get('original_scenario', 'Unknown')
             st.success(f"🎯 **Custom Optimized Scenario**: You are viewing optimized parameters based on '{original_name}'. Use sidebar controls to revert or save this scenario.")
+        
+        # Unprofitable scenario optimization guidance
+        if current.get('name') == 'Unprofitable Example (Optimizable)' and metrics['margin'] < 0:
+            st.warning("""
+            🎯 **Optimization Opportunity**: This scenario is currently unprofitable, but can be optimized! 
+            
+            **Try this:**
+            1. Set **Minimum Coverage: 60-70%** and **Minimum Margin: 5-10%** in sidebar
+            2. Click **"Find Optimal Parameters"** to see if optimization can make it profitable
+            3. If successful, click **"Apply Optimal Parameters"** to see the transformation
+            """)
         
         # Show optimization results indicator if available
         if 'optimization_result' in st.session_state and st.session_state.optimization_result['feasible']:

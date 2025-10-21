@@ -17,18 +17,18 @@ PROFITABLE_SCENARIO = {
     'monthly_usage_per_line': 2.0  # Lower usage for better profitability
 }
 
-# Unprofitable Scenario
+# Unprofitable Scenario - Optimizable to Profitable
 UNPROFITABLE_SCENARIO = {
-    'name': 'Unprofitable Example',
-    'description': 'Suboptimal settings leading to losses',
+    'name': 'Unprofitable Example (Optimizable)',
+    'description': 'Suboptimal settings leading to losses - but can be optimized to profitable',
     'students': 500,
-    'cap': 8.0,  # High data cap
-    'budget': 8000.0,  # Low budget
-    'carrier_rate': 12.0,  # High carrier cost
-    'customer_price': 15.0,  # Low customer price
-    'policy': 'Public Sector (Schools)',
-    'throttling': False,
-    'monthly_usage_per_line': 3.5  # Higher usage to ensure unprofitability
+    'cap': 6.0,  # Moderate data cap
+    'budget': 10000.0,  # Reasonable budget
+    'carrier_rate': 9.0,  # Moderate carrier cost
+    'customer_price': 20.0,  # Moderate customer price
+    'policy': 'Retail (Households)',
+    'throttling': False,  # No throttling (inefficient)
+    'monthly_usage_per_line': 4.0  # High usage without optimization
 }
 
 # Additional test scenarios
