@@ -539,6 +539,51 @@ def save_custom_scenario(scenario_data, name):
         **scenario_data
     }
 
+def create_optimized_scenario(original_scenario, optimization_result):
+    """Create a custom optimized scenario from optimization results."""
+    optimized_scenario = original_scenario.copy()
+    
+    # Update with optimized parameters
+    if optimization_result['recommended_base_plan_gb'] is not None:
+        optimized_scenario['base_plan_gb'] = optimization_result['recommended_base_plan_gb']
+    if optimization_result['recommended_sco_efficiency'] is not None:
+        optimized_scenario['sco_efficiency'] = optimization_result['recommended_sco_efficiency']
+    if optimization_result['recommended_overage_rate'] is not None:
+        optimized_scenario['overage_rate'] = optimization_result['recommended_overage_rate']
+    if optimization_result['recommended_plan_switching_cost'] is not None:
+        optimized_scenario['plan_switching_cost'] = optimization_result['recommended_plan_switching_cost']
+    if optimization_result['recommended_monthly_usage_per_line'] is not None:
+        optimized_scenario['monthly_usage_per_line'] = optimization_result['recommended_monthly_usage_per_line']
+    if optimization_result['recommended_throttling'] is not None:
+        optimized_scenario['throttling'] = optimization_result['recommended_throttling']
+    
+    # Mark as optimized
+    optimized_scenario['name'] = 'Custom Optimized'
+    optimized_scenario['description'] = f'Optimized version of {original_scenario.get("name", "scenario")}'
+    optimized_scenario['is_optimized'] = True
+    optimized_scenario['original_scenario'] = original_scenario.get('name', 'Unknown')
+    
+    return optimized_scenario
+
+def display_optimized_scenario_banner():
+    """Display banner indicating user is viewing an optimized scenario."""
+    if st.session_state.get('viewing_optimized_scenario', False):
+        st.markdown("""
+        <div style="
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        ">
+            🎯 <strong>Custom Optimized Scenario</strong> - You are viewing optimized parameters. 
+            <a href="#" onclick="window.location.reload()" style="color: white; text-decoration: underline;">Click to revert to original</a>
+        </div>
+        """, unsafe_allow_html=True)
+
 def export_scenario_summary(metrics, students, cap, budget, carrier_rate, customer_price, policy, throttling):
     """Export current scenario as CSV."""
     summary_data = {
@@ -566,6 +611,9 @@ def main():
     st.markdown('<h1 class="main-header">📊 Margin Impact Simulator</h1>', unsafe_allow_html=True)
     st.markdown("---")
     
+    # Display optimized scenario banner if applicable
+    display_optimized_scenario_banner()
+    
     # Help & User Guide
     display_help_guide()
     
@@ -584,6 +632,30 @@ def main():
     # Dropdown for all scenarios - default to profitable scenario
     scenario_options = {f"{k}: {v['name']}": k for k, v in scenarios.items()}
     # Find the index of the profitable scenario
+    
+    # Scenario management controls
+    if st.session_state.get('viewing_optimized_scenario', False):
+        st.sidebar.markdown("---")
+        st.sidebar.subheader("🎯 Custom Optimized Scenario")
+        
+        col1, col2 = st.sidebar.columns(2)
+        with col1:
+            if st.button("🔄 Revert to Original", key="revert_scenario", help="Return to the original scenario"):
+                # Restore original scenario
+                if 'original_scenario' in st.session_state:
+                    st.session_state.current_scenario = st.session_state.original_scenario
+                    st.session_state.viewing_optimized_scenario = False
+                    del st.session_state.original_scenario
+                    safe_rerun()
+        
+        with col2:
+            if st.button("💾 Save as New", key="save_optimized", help="Save this optimized scenario"):
+                # Save the current optimized scenario
+                optimized_name = f"Optimized_{st.session_state.current_scenario.get('original_scenario', 'Unknown')}_{datetime.now().strftime('%Y%m%d_%H%M')}"
+                save_custom_scenario(st.session_state.current_scenario, optimized_name)
+                st.sidebar.success(f"✅ Saved as '{optimized_name}'")
+        
+        st.sidebar.markdown("---")
     profitable_index = list(scenario_options.keys()).index("profitable: Profitable Example")
     selected_scenario_key = st.sidebar.selectbox(
         "Choose a scenario:",
@@ -637,6 +709,11 @@ def main():
             st.session_state.monthly_usage_per_line = scenario['monthly_usage_per_line']
         else:
             st.session_state.monthly_usage_per_line = 2.5  # Default usage
+        
+        # Clear optimized scenario state when loading a new predefined scenario
+        st.session_state.viewing_optimized_scenario = False
+        if 'original_scenario' in st.session_state:
+            del st.session_state.original_scenario
         
         # Clear optimization and AI results to prevent contamination
         if 'optimization_result' in st.session_state:
@@ -1140,6 +1217,11 @@ def main():
         else:
             st.info("📊 **Traditional Model**: This view shows standard performance metrics. Enable SCO in sidebar to see optimization benefits.")
         
+        # Optimized scenario indicator
+        if st.session_state.get('viewing_optimized_scenario', False):
+            original_name = st.session_state.current_scenario.get('original_scenario', 'Unknown')
+            st.success(f"🎯 **Custom Optimized Scenario**: You are viewing optimized parameters based on '{original_name}'. Use sidebar controls to revert or save this scenario.")
+        
         # Show optimization results indicator if available
         if 'optimization_result' in st.session_state and st.session_state.optimization_result['feasible']:
             st.success("🎯 **Fresh Optimization Results Available!** Scroll down to see the detailed analysis and comparison charts.")
@@ -1455,6 +1537,15 @@ def main():
                 
                 # Apply button
                 if st.button("✅ Apply Optimal Parameters", type="primary", key="apply_optimal_parameters"):
+                    # Create optimized scenario
+                    original_scenario = st.session_state.current_scenario.copy()
+                    optimized_scenario = create_optimized_scenario(original_scenario, result)
+                    
+                    # Set the optimized scenario as current
+                    st.session_state.current_scenario = optimized_scenario
+                    st.session_state.viewing_optimized_scenario = True
+                    st.session_state.original_scenario = original_scenario
+                    
                     # Update session state with optimized values
                     if sco_enabled:
                         # Update SCO parameters
@@ -1473,7 +1564,7 @@ def main():
                     if 'optimization_completed' in st.session_state:
                         del st.session_state.optimization_completed
                     
-                    st.success("✅ Optimal parameters applied! The scenario has been updated.")
+                    st.success("🎯 **Custom Optimized Scenario Created!** You are now viewing the optimized version. Use the banner above to revert to the original scenario.")
                     # Trigger rerun to update the UI
                     safe_rerun()
             else:
